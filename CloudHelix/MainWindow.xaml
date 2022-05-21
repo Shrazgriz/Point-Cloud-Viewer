@@ -25,7 +25,7 @@
                 <PerspectiveCamera LookDirection="5,10,-10" UpDirection="0,0,1"/>
             </h:HelixViewport3D.Camera>
             <!-- The plot visual (surface, axes and labels) -->
-            <local:CloudViewer x:Name="cd" IntervalX="200" IntervalY="200" IntervalZ="10" FontSize="10" LineThickness="1" />
+            <local:CloudViewer x:Name="cd" IntervalX="200" IntervalY="200" IntervalZ="10" FontSize="10" LineThickness="7" PointSize="2" PointColor="#FFFD0707" />
 
         </h:HelixViewport3D>
 
@@ -78,11 +78,6 @@
                         </TreeView.ContextMenu>
                     </TreeView>
                 </StackPanel>
-            </ScrollViewer>
-        </materialDesign:Card>
-        <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="1" HorizontalAlignment="Stretch" >
-            <ScrollViewer VerticalAlignment="Stretch">
-                <TextBox Name="TB_output" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             </ScrollViewer>
         </materialDesign:Card>
         <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >

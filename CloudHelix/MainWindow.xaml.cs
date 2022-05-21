@@ -16,9 +16,9 @@ namespace CloudHelix
     /// </summary>
     public partial class MainWindow : Window
     {
-        Parameters parameters;
+        private Parameters parameters;
         private const string OpenModelFilter = "3D model files (*.3ds;*.obj;*.lwo;*.stl;*.ply;)|*.3ds;*.obj;*.objz;*.lwo;*.stl;*.ply;";
-        private CloudReader filereader;
+        private readonly CloudReader filereader;
 
         public MainWindow()
         {
@@ -34,10 +34,15 @@ namespace CloudHelix
             {
                 parameters.CloudFilePath = open.FileName;
                 WReadCloud readcloud = new WReadCloud(parameters);
-                if (readcloud.ShowDialog() != true) return;
-                filereader.Scale = parameters.Cloudscale;
+                if (readcloud.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                filereader.Scale = V3.Identity;
                 filereader.FileName = parameters.CloudFilePath;
                 filereader.Format = parameters.Cloudformat;
+                cd.Scale = parameters.Cloudscale;
 
                 List<w3d.Point3D> pointBuffer = new List<w3d.Point3D>();
 
@@ -59,18 +64,16 @@ namespace CloudHelix
                 {
                     #region 无序点云
                     MVUnity.Point3D[] pts = filereader.ReadCloud(parameters.VertexSkip);
-                    foreach (var pt in pts)
-                    {
-                        pointBuffer.Add(new w3d.Point3D(pt.X, pt.Y, pt.Z));
-                    }
+                    pointBuffer.AddRange(from MVUnity.Point3D pt in pts
+                                         select new w3d.Point3D(pt.X, pt.Y, pt.Z));
                     #endregion
                 }
                 cd.Points = pointBuffer.ToArray();
                 cd.PointColor = parameters.PointBrush.Color;
                 cd.PointSize = parameters.PointSize;
                 cd.Update();
-                V3 c = 0.5 * (filereader.Max + filereader.Min);
-                w3d.Point3D center = new w3d.Point3D(c.X, c.Y, c.Z);
+                Vector3D c = 0.5 * (cd.Ceiling + cd.Floor);
+                w3d.Point3D center = new w3d.Point3D(c.X * cd.Scale.X, c.Y * cd.Scale.Y, c.Z * cd.Scale.Z);
                 x3d.Camera.LookAt(center, 2f);
             }
         }
@@ -81,8 +84,7 @@ namespace CloudHelix
             if (open.ShowDialog() == true)
             {
                 ModelImporter reader = new ModelImporter();
-                var mg = reader.Load(open.FileName);
-
+                Model3DGroup mg = reader.Load(open.FileName);
                 x3d.Children.Add(new ModelVisual3D() { Content = mg });
             }
         }

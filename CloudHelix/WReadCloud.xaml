@@ -43,7 +43,7 @@
         </StackPanel>
         <StackPanel Grid.Column="0" Grid.Row="1" Margin="8" Orientation="Vertical">
             <TextBox x:Name="TB_Scale" Margin="4" 
-                         Text="{Binding Path= Cloudscale, Converter={StaticResource V3ToStringConverter}, Mode=TwoWay}"/>
+                         Text="{Binding Path= Cloudscale, Mode=TwoWay}"/>
             <TextBox x:Name="TB_Format" Margin="4" 
                          Text="{Binding Path= Cloudformat, Mode=TwoWay}"/>
         </StackPanel>

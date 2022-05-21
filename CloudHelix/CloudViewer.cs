@@ -28,6 +28,8 @@ namespace CloudHelix
             DependencyProperty.Register("Size", typeof(int), typeof(CloudViewer), new UIPropertyMetadata(4, ModelChanged));
         public static readonly DependencyProperty AutoLabelProperty =
             DependencyProperty.Register("AutoLabel", typeof(bool), typeof(CloudViewer), new UIPropertyMetadata(true, ModelChanged));
+        public static readonly DependencyProperty ScaleProperty =
+            DependencyProperty.Register("Scale", typeof(Vector3D), typeof(CloudViewer), new UIPropertyMetadata(new Vector3D(1, 1, 1), ModelChanged));
         private static void ModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((CloudViewer)d).UpdateModel();
@@ -50,13 +52,23 @@ namespace CloudHelix
             Model3DGroup plotModel = new Model3DGroup();
             PointsVisual3D PV = new PointsVisual3D()
             {
-                Points = new Point3DCollection(Points),
                 Color = PointColor,
                 Size = PointSize
             };
+            if ((Points == null) || (Points.Length == 0))
+            {
+                return plotModel;
+            }
+
+            Point3DCollection pcl = new Point3DCollection();
+            foreach (Point3D point in Points)
+            {
+                pcl.Add(new Point3D(point.X * Scale.X, point.Y * Scale.Y, point.Z * Scale.Z));
+            }
+            PV.Points = pcl;
             PV.Content.SetName(PointsName);
             plotModel.Children.Add(PV.Content);
-            if ((Points == null) || (Points.Length == 0)) return plotModel;
+
             if (AutoLabel)
             {
                 double minX = Points.Min(p => p.X); ;
@@ -69,19 +81,18 @@ namespace CloudHelix
                 floor = new Vector3D(minX, minY, minZ);
             }
 
-            // create bounding box with axes indications
-            var axesMeshBuilder = new MeshBuilder();
+            MeshBuilder axesMeshBuilder = new MeshBuilder();
             for (double x = Floor.X; x <= Ceiling.X; x += IntervalX)
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D(x.ToString("F0"), Brushes.Black, true, FontSize,
-                                                                           new Point3D(x, Floor.Y - (FontSize * 2.5), Floor.Z),
+                                                                           new Point3D(x * Scale.X, Floor.Y * Scale.Y - (FontSize * 2.5), Floor.Z * Scale.Z),
                                                                            new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
                 plotModel.Children.Add(label);
             }
 
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X-axis", Brushes.Black, true, FontSize,
-                                                                           new Point3D((Floor.X + Ceiling.X) * 0.5, Floor.Y - (FontSize * 6), Floor.Z),
+                                                                           new Point3D((Floor.X + Ceiling.X) * 0.5 * Scale.X, Floor.Y * Scale.Y - (FontSize * 6), Floor.Z * Scale.Z),
                                                                            new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
                 plotModel.Children.Add(label);
             }
@@ -89,13 +100,13 @@ namespace CloudHelix
             for (double y = Floor.Y; y <= Ceiling.Y; y += IntervalY)
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D(y.ToString("F0"), Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X - (FontSize * 3), y, Floor.Z),
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), y * Scale.Y, Floor.Z * Scale.Z),
                                                                            new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
                 plotModel.Children.Add(label);
             }
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y-axis", Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5, Floor.Z),
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5 * Scale.Y, Floor.Z * Scale.Z),
                                                                            new Vector3D(0, 1, 0), new Vector3D(-1, 0, 0));
                 plotModel.Children.Add(label);
             }
@@ -103,20 +114,21 @@ namespace CloudHelix
             for (double z = z0; z <= Ceiling.Z + double.Epsilon; z += IntervalZ)
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D(z.ToString("F0"), Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X - (FontSize * 3), Ceiling.Y, z),
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), Ceiling.Y * Scale.Y, z * Scale.Z),
                                                                            new Vector3D(1, 0, 0), new Vector3D(0, 0, 1));
                 plotModel.Children.Add(label);
             }
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z-axis", Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X - (FontSize * 10), Ceiling.Y, (Floor.Z + Ceiling.Z) * 0.5),
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), Ceiling.Y * Scale.Y, (Floor.Z + Ceiling.Z) * 0.5 * Scale.Z),
                                                                            new Vector3D(0, 0, 1), new Vector3D(1, 0, 0));
                 plotModel.Children.Add(label);
             }
 
-            var bb = new Rect3D(Floor.X, Floor.Y, Floor.Z, Ceiling.X - Floor.X, Ceiling.Y - Floor.Y, Ceiling.Z - Floor.Z);
+            Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
+                (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
             axesMeshBuilder.AddBoundingBox(bb, LineThickness);
-            var axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
+            GeometryModel3D axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
             axesModel.SetName(AxisName);
             plotModel.Children.Add(axesModel);
             return plotModel;
@@ -136,6 +148,11 @@ namespace CloudHelix
         {
             get { return (int)GetValue(SizeProperty); }
             set { SetValue(SizeProperty, value); }
+        }
+        public Vector3D Scale
+        {
+            get { return (Vector3D)GetValue(ScaleProperty); }
+            set { SetValue(ScaleProperty, value); }
         }
         public double IntervalX { get; set; }
         public double IntervalY { get; set; }
@@ -182,7 +199,7 @@ namespace CloudHelix
             IntervalZ = 1;
             FontSize = 0.06;
             LineThickness = 0.01;
-            //Visible = true;
+            Scale = new Vector3D(1, 1, 1);
             visualChild = new ModelVisual3D();
             Children.Add(visualChild);
         }

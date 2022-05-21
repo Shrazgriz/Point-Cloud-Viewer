@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Configuration;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using MVUnity;
 
 namespace CloudHelix
@@ -15,7 +16,7 @@ namespace CloudHelix
         private double planeRhoTol;
         private int rowSkip;
         private int columnSkip;
-        private V3 cloudscale;
+        private Vector3D cloudscale;
         private string cloudformat;
         private double maxGap;
         private double rhoTolerance;
@@ -35,7 +36,7 @@ namespace CloudHelix
         public double PlaneRhoTol { get => planeRhoTol; set => planeRhoTol = value; }
         public int RowSkip { get => rowSkip; set => rowSkip = value; }
         public int VertexSkip { get => columnSkip; set => columnSkip = value; }
-        public V3 Cloudscale { get => cloudscale; set => cloudscale = value; }
+        public Vector3D Cloudscale { get => cloudscale; set => cloudscale = value; }
         public string Cloudformat { get => cloudformat; set => cloudformat = value; }
         public double MaxGap { get => maxGap; set => maxGap = value; }
         public double RhoTolerance { get => rhoTolerance; set => rhoTolerance = value; }
@@ -63,7 +64,7 @@ namespace CloudHelix
             RhoTolerance = double.Parse(ConfigurationManager.AppSettings["RhoTolerance"]);
             MaxGap = double.Parse(ConfigurationManager.AppSettings["MaxSewGap"]);
             Cloudformat = ConfigurationManager.AppSettings["CloudFormat"];
-            Cloudscale = new V3(ConfigurationManager.AppSettings["CloudScale"]);
+            Cloudscale = Vector3D.Parse(ConfigurationManager.AppSettings["CloudScale"]);
             PlaneNormTol = double.Parse(ConfigurationManager.AppSettings["PlaneNormTolerance"]);
             PlaneRhoTol = double.Parse(ConfigurationManager.AppSettings["PlaneRhoTolerance"]);
             CellNormTol = double.Parse(ConfigurationManager.AppSettings["CellNormTolerance"]);
