@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         <materialDesign:Card x:Name="CardCD" Margin="4" Padding="4" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" >
             <StackPanel Margin="0" Orientation="Vertical">
-                <TextBlock FontSize="16" HorizontalAlignment="Center">点云显示</TextBlock>
+                <TextBlock FontSize="16" HorizontalAlignment="Center">刻度</TextBlock>
                 <Label Margin="4">上界</Label>
                 <TextBox Margin="2" Text="{Binding Path=Ceiling}"/>
                 <Label Margin="4">下界</Label>
@@ -38,28 +38,15 @@
         </materialDesign:Card>
         <materialDesign:Card x:Name="CardRec" Margin="4" Padding="4" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" >
             <StackPanel Margin="0" Orientation="Vertical">
-                <TextBlock FontSize="16" HorizontalAlignment="Center">特征识别</TextBlock>
-                <Label Margin="4">最小单元数</Label>
-                <TextBox Margin="4" Text="{Binding Path=MinRegionArea}"/>
-                <Label Margin="4">最小面积</Label>
-                <TextBox Margin="4" Text="{Binding Path=MinRegionCellCount}"/>
-                <Label Margin="4">合并面积比例</Label>
-                <TextBox Margin="4" Text="{Binding Path=MergeRation}"/>
-                <Label Margin="4">法向搜索宽度</Label>
-                <TextBox Margin="4" Text="{Binding Path=BoundarySearchWidth}"/>
+                <TextBlock FontSize="16" HorizontalAlignment="Center">点云</TextBlock>
+                <Label Margin="4">线宽</Label>
+                <TextBox Margin="4" Text="{Binding Path=LineThickness}"/>
+                <Label Margin="4">字号</Label>
+                <TextBox Margin="4" Text="{Binding Path=FontSize}"/>
+                <CheckBox Margin="4" IsChecked="{Binding Path=DrawBox}" >绘制边界</CheckBox>
+                <CheckBox Margin="4" IsChecked="{Binding Path=DrawGrid}">绘制网格</CheckBox>
             </StackPanel>
-        </materialDesign:Card>
-        <materialDesign:Card x:Name="CardGeo" Margin="4" Padding="4" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" >
-            <StackPanel Margin="0" Orientation="Vertical">
-                <TextBlock FontSize="16" HorizontalAlignment="Center">几何构造</TextBlock>
-                <Label Margin="4">最小单元数</Label>
-                <TextBox Margin="4" Text="{Binding Path=MinRegionArea}"/>
-                <Label Margin="4">最小面积</Label>
-                <TextBox Margin="4" Text="{Binding Path=MinRegionCellCount}"/>
-                <Label Margin="4">合并面积比例</Label>
-                <TextBox Margin="4" Text="{Binding Path=MergeRation}"/>
-            </StackPanel>
-        </materialDesign:Card>
+        </materialDesign:Card>        
         <StackPanel Margin="10" Grid.ColumnSpan="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
             <Button x:Name="BN_OK" Margin="8 0" MinWidth="100" HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignRaisedAccentButton}"
                     Click="BN_OK_Click">

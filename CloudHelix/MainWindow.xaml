@@ -15,7 +15,7 @@
             <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" MinWidth="300"/>
+            <ColumnDefinition Width="1*" MinWidth="200"/>
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
         <h:HelixViewport3D Name="x3d" ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" 
@@ -24,8 +24,9 @@
                 <!-- HelixViewport3D.ZoomExtentsWhenLoaded will figure out the position of the Camera -->
                 <PerspectiveCamera LookDirection="5,10,-10" UpDirection="0,0,1"/>
             </h:HelixViewport3D.Camera>
+            <h:SunLight />
             <!-- The plot visual (surface, axes and labels) -->
-            <local:CloudViewer x:Name="cd" IntervalX="200" IntervalY="200" IntervalZ="10" FontSize="10" LineThickness="7" PointSize="2" PointColor="#FFFD0707" />
+            <local:CloudViewer x:Name="cd" IntervalX="200" IntervalY="200" IntervalZ="10" FontSize="10" LineThickness="6" PointSize="2" PointColor="#FFFD0707" />
 
         </h:HelixViewport3D>
 
@@ -39,17 +40,11 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        
+                        </Grid.ColumnDefinitions>                        
                     </Grid>
-                    <ListView x:Name="List_Selection" ItemsSource="{Binding Path=SelectedInfos}">
-                        
+                    <ListView x:Name="List_Selection" ItemsSource="{Binding Path=SelectedInfos}">                        
                     </ListView>
                     <WrapPanel>
-                        <Button x:Name="ConfirmSelection" Margin="4" ToolTip="选作边界" Grid.Column="0"
-                                >
-                            <materialDesign:PackIcon Kind="BoxDown" Width="24" Height="24"/>
-                        </Button>
                         <Button x:Name="BN_Search" Margin="4" ToolTip="搜索" Grid.Column="1"
                                 >
                             <materialDesign:PackIcon Kind="SearchAdd"  Width="24" Height="24"/>
@@ -57,17 +52,8 @@
                         <Button x:Name="BN_MergePlate" Margin="4" ToolTip="合并平面" Grid.Column="2"
                                  >
                             <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24"/>
-                        </Button>
-                        <Button x:Name="BN_MergeCurve" Margin="4" ToolTip="合并曲面" Grid.Column="2"
-                                >
-                            <materialDesign:PackIcon Kind="VectorCurve" Width="24" Height="24"/>
-                        </Button>
-                        <Button x:Name="BN_IsoStructure" Margin="4" ToolTip="单独构件" Grid.Column="3"
-                                 >
-                            <materialDesign:PackIcon Kind="VectorPolygon" Width="24" Height="24"/>
-                        </Button>
+                        </Button>                        
                     </WrapPanel>
-
                     <TreeView Name="Tree_GS" ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged}"
                               >
                         <TreeView.ContextMenu>

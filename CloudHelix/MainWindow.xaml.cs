@@ -38,11 +38,10 @@ namespace CloudHelix
                 {
                     return;
                 }
-
                 filereader.Scale = V3.Identity;
                 filereader.FileName = parameters.CloudFilePath;
                 filereader.Format = parameters.Cloudformat;
-                cd.Scale = parameters.Cloudscale;
+                cd.Scale = parameters.Scale;
 
                 List<w3d.Point3D> pointBuffer = new List<w3d.Point3D>();
 
@@ -85,7 +84,8 @@ namespace CloudHelix
             {
                 ModelImporter reader = new ModelImporter();
                 Model3DGroup mg = reader.Load(open.FileName);
-                x3d.Children.Add(new ModelVisual3D() { Content = mg });
+                ScaleTransform3D sca = new ScaleTransform3D(parameters.Scale);
+                x3d.Children.Add(new ModelVisual3D() { Content = mg, Transform = sca });
             }
         }
 

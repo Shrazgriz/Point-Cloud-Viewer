@@ -15,8 +15,7 @@ namespace CloudHelix
             Parameters = parameters;
             CloudV = cd;
             CardCD.DataContext = CloudV;
-            CardGeo.DataContext = Parameters;
-            CardRec.DataContext = Parameters;
+            CardRec.DataContext = CloudV;
         }
 
         private void BN_OK_Click(object sender, RoutedEventArgs e)
@@ -28,5 +27,6 @@ namespace CloudHelix
         {
             DialogResult = false;
         }
+
     }
 }

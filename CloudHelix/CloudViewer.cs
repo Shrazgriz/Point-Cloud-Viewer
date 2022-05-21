@@ -3,6 +3,7 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
 using System.Linq;
+using System;
 
 namespace CloudHelix
 {
@@ -13,6 +14,7 @@ namespace CloudHelix
     {
         private const string AxisName = "Axis";
         private const string PointsName = "Points";
+        private const string GridName = "Grids";
 
         /// <summary>
         /// container for scatter points
@@ -71,66 +73,23 @@ namespace CloudHelix
 
             if (AutoLabel)
             {
-                double minX = Points.Min(p => p.X); ;
-                double maxX = Points.Max(p => p.X);
-                double minY = Points.Min(p => p.Y);
-                double maxY = Points.Max(p => p.Y);
-                double minZ = Points.Min(p => p.Z);
-                double maxZ = Points.Max(p => p.Z);
+                double minX = Math.Floor(Points.Min(p => p.X) / IntervalX) * IntervalX;
+                double maxX = Math.Ceiling(Points.Max(p => p.X) / IntervalX) * IntervalX;
+                double minY = Math.Floor(Points.Min(p => p.Y) / IntervalY) * IntervalY;
+                double maxY = Math.Ceiling(Points.Max(p => p.Y) / IntervalY) * IntervalY;
+                double minZ = Math.Floor(Points.Min(p => p.Z) / IntervalZ) * IntervalZ;
+                double maxZ = Math.Ceiling(Points.Max(p => p.Z) / IntervalZ) * IntervalZ;
                 ceiling = new Vector3D(maxX, maxY, maxZ);
                 floor = new Vector3D(minX, minY, minZ);
             }
-
-            MeshBuilder axesMeshBuilder = new MeshBuilder();
-            for (double x = Floor.X; x <= Ceiling.X; x += IntervalX)
+            if (DrawBox)
             {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D(x.ToString("F0"), Brushes.Black, true, FontSize,
-                                                                           new Point3D(x * Scale.X, Floor.Y * Scale.Y - (FontSize * 2.5), Floor.Z * Scale.Z),
-                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
-                plotModel.Children.Add(label);
+                plotModel.Children.Add(DrawBoundingBox());
             }
-
+            if (DrawGrid)
             {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X-axis", Brushes.Black, true, FontSize,
-                                                                           new Point3D((Floor.X + Ceiling.X) * 0.5 * Scale.X, Floor.Y * Scale.Y - (FontSize * 6), Floor.Z * Scale.Z),
-                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
-                plotModel.Children.Add(label);
-            }
-
-            for (double y = Floor.Y; y <= Ceiling.Y; y += IntervalY)
-            {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D(y.ToString("F0"), Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), y * Scale.Y, Floor.Z * Scale.Z),
-                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
-                plotModel.Children.Add(label);
-            }
-            {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y-axis", Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5 * Scale.Y, Floor.Z * Scale.Z),
-                                                                           new Vector3D(0, 1, 0), new Vector3D(-1, 0, 0));
-                plotModel.Children.Add(label);
-            }
-            double z0 = (int)(Floor.Z / IntervalZ) * IntervalZ;
-            for (double z = z0; z <= Ceiling.Z + double.Epsilon; z += IntervalZ)
-            {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D(z.ToString("F0"), Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), Ceiling.Y * Scale.Y, z * Scale.Z),
-                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 0, 1));
-                plotModel.Children.Add(label);
-            }
-            {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z-axis", Brushes.Black, true, FontSize,
-                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), Ceiling.Y * Scale.Y, (Floor.Z + Ceiling.Z) * 0.5 * Scale.Z),
-                                                                           new Vector3D(0, 0, 1), new Vector3D(1, 0, 0));
-                plotModel.Children.Add(label);
-            }
-
-            Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
-                (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
-            axesMeshBuilder.AddBoundingBox(bb, LineThickness);
-            GeometryModel3D axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
-            axesModel.SetName(AxisName);
-            plotModel.Children.Add(axesModel);
+                plotModel.Children.Add(DrawGridLine());
+            }            
             return plotModel;
         }
 
@@ -154,6 +113,8 @@ namespace CloudHelix
             get { return (Vector3D)GetValue(ScaleProperty); }
             set { SetValue(ScaleProperty, value); }
         }
+        public bool DrawBox { get; set; }
+        public bool DrawGrid { get; set; }
         public double IntervalX { get; set; }
         public double IntervalY { get; set; }
         public double IntervalZ { get; set; }
@@ -200,8 +161,93 @@ namespace CloudHelix
             FontSize = 0.06;
             LineThickness = 0.01;
             Scale = new Vector3D(1, 1, 1);
+            DrawBox = true;
+            DrawGrid = true;
             visualChild = new ModelVisual3D();
             Children.Add(visualChild);
+        }
+
+        private Model3DGroup DrawBoundingBox()
+        {
+            Model3DGroup plotModel = new Model3DGroup();
+            MeshBuilder axesMeshBuilder = new MeshBuilder();
+            for (double x = Floor.X; x <= Ceiling.X; x += IntervalX)
+            {
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D(x.ToString("F0"), Brushes.Black, true, FontSize,
+                                                                           new Point3D(x * Scale.X, Floor.Y * Scale.Y - (FontSize * 2.5), Floor.Z * Scale.Z),
+                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
+                plotModel.Children.Add(label);
+            }
+
+            {
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X-axis", Brushes.Black, true, FontSize,
+                                                                           new Point3D((Floor.X + Ceiling.X) * 0.5 * Scale.X, Floor.Y * Scale.Y - (FontSize * 6), Floor.Z * Scale.Z),
+                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
+                plotModel.Children.Add(label);
+            }
+
+            for (double y = Floor.Y; y <= Ceiling.Y; y += IntervalY)
+            {
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D(y.ToString("F0"), Brushes.Black, true, FontSize,
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), y * Scale.Y, Floor.Z * Scale.Z),
+                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
+                plotModel.Children.Add(label);
+            }
+            {
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y-axis", Brushes.Black, true, FontSize,
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5 * Scale.Y, Floor.Z * Scale.Z),
+                                                                           new Vector3D(0, 1, 0), new Vector3D(-1, 0, 0));
+                plotModel.Children.Add(label);
+            }
+            for (double z = Floor.Z; z <= Ceiling.Z + double.Epsilon; z += IntervalZ)
+            {
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D(z.ToString("F0"), Brushes.Black, true, FontSize,
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), Ceiling.Y * Scale.Y, z * Scale.Z),
+                                                                           new Vector3D(1, 0, 0), new Vector3D(0, 0, 1));
+                plotModel.Children.Add(label);
+            }
+            {
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z-axis", Brushes.Black, true, FontSize,
+                                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), Ceiling.Y * Scale.Y, (Floor.Z + Ceiling.Z) * 0.5 * Scale.Z),
+                                                                           new Vector3D(0, 0, 1), new Vector3D(1, 0, 0));
+                plotModel.Children.Add(label);
+            }
+
+            Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
+                (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
+            axesMeshBuilder.AddBoundingBox(bb, LineThickness);
+            GeometryModel3D axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
+            axesModel.SetName(AxisName);
+            plotModel.Children.Add(axesModel);
+            return plotModel;
+        }
+
+        private Model3DGroup DrawGridLine()
+        {
+            Model3DGroup plotModel = new Model3DGroup();
+            MeshBuilder gridMeshBuilder = new MeshBuilder();
+            for (double x = Floor.X; x <= Ceiling.X; x += IntervalX)
+            {
+                gridMeshBuilder.AddQuad(new Point3D(x - (LineThickness * 0.25f), Floor.Y, Floor.Z),
+                    new Point3D(x + (LineThickness * 0.25f), Floor.Y, Floor.Z),
+                    new Point3D(x + (LineThickness * 0.25f), Ceiling.Y, Floor.Z),
+                    new Point3D(x - (LineThickness * 0.25f), Ceiling.Y, Floor.Z));
+            }
+            for (double y = Floor.Y; y <= Ceiling.Y; y += IntervalY)
+            {
+                gridMeshBuilder.AddQuad(new Point3D(Floor.X, y - (LineThickness * 0.25f), Floor.Z),
+                    new Point3D(Floor.X, y + (LineThickness * 0.25f), Floor.Z),
+                    new Point3D(Ceiling.X, y + (LineThickness * 0.25f), Floor.Z),
+                    new Point3D(Ceiling.X, y - (LineThickness * 0.25f), Floor.Z));
+            }
+            GeometryModel3D gridModel = new GeometryModel3D(gridMeshBuilder.ToMesh(), Materials.Gray)
+            {
+                BackMaterial = Materials.Gray,
+                Transform = new ScaleTransform3D(Scale)
+            };
+            gridModel.SetName(GridName);
+            plotModel.Children.Add(gridModel);
+            return plotModel;
         }
     }
 }
