@@ -1,0 +1,70 @@
+﻿<Window x:Class="CloudHelix.WConfig"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:CloudHelix"
+        mc:Ignorable="d"
+        Title="WConfig" Height="450" Width="800">
+    <Window.Resources>
+        <local:V3ToSolidBrushConverter x:Key="V3ToColorConverter"/>
+        <local:V3ToStringConverter x:Key="V3ToStringConverter"/>
+    </Window.Resources>
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition MaxHeight="80"/>
+        </Grid.RowDefinitions>
+        <materialDesign:Card x:Name="CardCD" Margin="4" Padding="4" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" >
+            <StackPanel Margin="0" Orientation="Vertical">
+                <TextBlock FontSize="16" HorizontalAlignment="Center">点云显示</TextBlock>
+                <Label Margin="4">上界</Label>
+                <TextBox Margin="2" Text="{Binding Path=Ceiling}"/>
+                <Label Margin="4">下界</Label>
+                <TextBox Margin="2" Text="{Binding Path=Floor}"/>
+                <Label Margin="4">X刻度</Label>
+                <TextBox Margin="2" Text="{Binding Path=IntervalX}"/>
+                <Label Margin="4">Y刻度</Label>
+                <TextBox Margin="2" Text="{Binding Path=IntervalY}"/>
+                <Label Margin="4">Z刻度</Label>
+                <TextBox Margin="2" Text="{Binding Path=IntervalZ}"/>
+            </StackPanel>
+        </materialDesign:Card>
+        <materialDesign:Card x:Name="CardRec" Margin="4" Padding="4" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" >
+            <StackPanel Margin="0" Orientation="Vertical">
+                <TextBlock FontSize="16" HorizontalAlignment="Center">特征识别</TextBlock>
+                <Label Margin="4">最小单元数</Label>
+                <TextBox Margin="4" Text="{Binding Path=MinRegionArea}"/>
+                <Label Margin="4">最小面积</Label>
+                <TextBox Margin="4" Text="{Binding Path=MinRegionCellCount}"/>
+                <Label Margin="4">合并面积比例</Label>
+                <TextBox Margin="4" Text="{Binding Path=MergeRation}"/>
+                <Label Margin="4">法向搜索宽度</Label>
+                <TextBox Margin="4" Text="{Binding Path=BoundarySearchWidth}"/>
+            </StackPanel>
+        </materialDesign:Card>
+        <materialDesign:Card x:Name="CardGeo" Margin="4" Padding="4" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" >
+            <StackPanel Margin="0" Orientation="Vertical">
+                <TextBlock FontSize="16" HorizontalAlignment="Center">几何构造</TextBlock>
+                <Label Margin="4">最小单元数</Label>
+                <TextBox Margin="4" Text="{Binding Path=MinRegionArea}"/>
+                <Label Margin="4">最小面积</Label>
+                <TextBox Margin="4" Text="{Binding Path=MinRegionCellCount}"/>
+                <Label Margin="4">合并面积比例</Label>
+                <TextBox Margin="4" Text="{Binding Path=MergeRation}"/>
+            </StackPanel>
+        </materialDesign:Card>
+        <StackPanel Margin="10" Grid.ColumnSpan="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <Button x:Name="BN_OK" Margin="8 0" MinWidth="100" HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignRaisedAccentButton}"
+                    Click="BN_OK_Click">
+                确 定
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

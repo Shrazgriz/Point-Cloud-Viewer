@@ -1,0 +1,102 @@
+﻿<Window x:Class="CloudHelix.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:CloudHelix"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition MaxHeight="60"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" MinWidth="300"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+        <h:HelixViewport3D Name="x3d" ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" 
+                           Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <h:HelixViewport3D.Camera>
+                <!-- HelixViewport3D.ZoomExtentsWhenLoaded will figure out the position of the Camera -->
+                <PerspectiveCamera LookDirection="5,10,-10" UpDirection="0,0,1"/>
+            </h:HelixViewport3D.Camera>
+            <!-- The plot visual (surface, axes and labels) -->
+            <local:CloudViewer x:Name="cd" IntervalX="200" IntervalY="200" IntervalZ="10" FontSize="10" LineThickness="1" />
+
+        </h:HelixViewport3D>
+
+        <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <ScrollViewer>
+                <StackPanel  HorizontalAlignment="Stretch" >
+                    <StackPanel.Resources>                        
+                    </StackPanel.Resources>
+                    <Grid x:Name="ModePanel" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        
+                    </Grid>
+                    <ListView x:Name="List_Selection" ItemsSource="{Binding Path=SelectedInfos}">
+                        
+                    </ListView>
+                    <WrapPanel>
+                        <Button x:Name="ConfirmSelection" Margin="4" ToolTip="选作边界" Grid.Column="0"
+                                >
+                            <materialDesign:PackIcon Kind="BoxDown" Width="24" Height="24"/>
+                        </Button>
+                        <Button x:Name="BN_Search" Margin="4" ToolTip="搜索" Grid.Column="1"
+                                >
+                            <materialDesign:PackIcon Kind="SearchAdd"  Width="24" Height="24"/>
+                        </Button>
+                        <Button x:Name="BN_MergePlate" Margin="4" ToolTip="合并平面" Grid.Column="2"
+                                 >
+                            <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24"/>
+                        </Button>
+                        <Button x:Name="BN_MergeCurve" Margin="4" ToolTip="合并曲面" Grid.Column="2"
+                                >
+                            <materialDesign:PackIcon Kind="VectorCurve" Width="24" Height="24"/>
+                        </Button>
+                        <Button x:Name="BN_IsoStructure" Margin="4" ToolTip="单独构件" Grid.Column="3"
+                                 >
+                            <materialDesign:PackIcon Kind="VectorPolygon" Width="24" Height="24"/>
+                        </Button>
+                    </WrapPanel>
+
+                    <TreeView Name="Tree_GS" ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged}"
+                              >
+                        <TreeView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="识别" />
+                                <MenuItem Header="移除" />
+                            </ContextMenu>
+                        </TreeView.ContextMenu>
+                    </TreeView>
+                </StackPanel>
+            </ScrollViewer>
+        </materialDesign:Card>
+        <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="1" HorizontalAlignment="Stretch" >
+            <ScrollViewer VerticalAlignment="Stretch">
+                <TextBox Name="TB_output" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </ScrollViewer>
+        </materialDesign:Card>
+        <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
+            <WrapPanel x:Name="MainPanel">
+                <Button x:Name="BN_ReadFile" Margin="4" ToolTip="读取点云" Height="Auto" Click="BN_ReadFile_Click">
+                    <materialDesign:PackIcon Kind="FolderOpenOutline" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_ReadModel" Margin="4" ToolTip="读取模型" Height="Auto" Click="BN_ReadModel_Click">
+                    <materialDesign:PackIcon Kind="Import" Width="28" Height="28"/>
+                </Button>                
+                <Button x:Name="BN_Config" Margin="4" ToolTip="参数设置" Height="Auto"  Click="BN_Config_Click">
+                    <materialDesign:PackIcon Kind="GearOutline" Width="28" Height="28" />
+                </Button>
+            </WrapPanel>
+        </materialDesign:Card>
+    </Grid>
+</Window>

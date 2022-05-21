@@ -1,0 +1,61 @@
+﻿<Window x:Class="CloudHelix.WReadCloud"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:CloudHelix"
+        mc:Ignorable="d"
+        Title="WReadCloud" Height="300" Width="400">
+    <Window.Resources>
+        <local:V3ToSolidBrushConverter x:Key="V3ToColorConverter"/>
+        <local:V3ToStringConverter x:Key="V3ToStringConverter"/>
+        <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+    </Window.Resources>
+    <Grid x:Name="MainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition MaxHeight="40"/>
+            <RowDefinition/>
+            <RowDefinition MaxHeight="60"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3" Grid.Row="0" Margin="8">
+            <Label Content="点云路径"/>
+            <TextBlock Margin="4 0" Text="{Binding Path=CloudFilePath}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="1" Margin="8" Orientation="Vertical">
+            <Label Margin="0">行采样密度</Label>
+            <TextBox Margin="0" Text="{Binding Path=RowSkip}"/>
+            <Label Margin="0">点采样密度</Label>
+            <TextBox Margin="0" Text="{Binding Path=VertexSkip}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical">
+            <Button Margin="4" Click="BN_Color_Click">
+                <materialDesign:PackIcon Kind="PaletteOutline"  Height="24" Width="24"/>
+            </Button>
+            <Rectangle x:Name="Rec_Brush" Margin="4" Width="30" Height="30" Fill="{Binding Path=PointBrush}" />
+            <TextBox x:Name="TB_PointSize" Margin="4"
+                     Text="{Binding Path=PointSize, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="0" Grid.Row="1" Margin="8" Orientation="Vertical">
+            <TextBox x:Name="TB_Scale" Margin="4" 
+                         Text="{Binding Path= Cloudscale, Converter={StaticResource V3ToStringConverter}, Mode=TwoWay}"/>
+            <TextBox x:Name="TB_Format" Margin="4" 
+                         Text="{Binding Path= Cloudformat, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Margin="10" Grid.ColumnSpan="2" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <Button x:Name="BN_OK" Margin="18 0" MinWidth="120" HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignRaisedAccentButton}"
+                    Click="BN_OK_Click">
+                确 定
+            </Button>
+            <Button x:Name="BN_Cancel" Margin="18 0" MinWidth="120" HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Click="BN_Cancel_Click">
+                取 消
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>
