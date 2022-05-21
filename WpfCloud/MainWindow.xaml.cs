@@ -9,7 +9,6 @@ using AnyCAD.Presentation;
 using MVUnity;
 using MVUnity.PointCloud;
 using MVUnity.Geometry3D;
-using System.Windows.Media.Imaging;
 using System.Linq;
 
 namespace WpfCloud
@@ -19,8 +18,6 @@ namespace WpfCloud
     /// </summary>
     public partial class MainWindow : Window
     {
-        readonly V3 origin = new V3(0, 0, 0);
-        readonly V3 scale = new V3(1, 1, 1);
         private RenderWindow3d renderView;
         private Parameters parameters;
         private Cloud3D cloud;
@@ -36,8 +33,6 @@ namespace WpfCloud
             renderView.Dock = DockStyle.Fill;
             renderView.MouseClick += new MouseEventHandler(OnRenderWindow_MouseClick);
             parameters = new Parameters();
-            //paras = new GeneralParas();
-            //ToolBox.DataContext = paras;
         }
 
         private void WriteLine(string content)
@@ -74,8 +69,8 @@ namespace WpfCloud
                 MVUnity.Exchange.CloudReader filereader = new MVUnity.Exchange.CloudReader
                 {
                     Scale = readcloud.Parameters.Cloudscale,
-                    FileName=open.FileName,
-                    Format=readcloud.Parameters.Cloudformat
+                    FileName = open.FileName,
+                    Format = readcloud.Parameters.Cloudformat
                 };
 
                 List<float> pointBuffer = new List<float>();
@@ -90,7 +85,7 @@ namespace WpfCloud
                         foreach (ScanRow row in rows)
                         {
                             int f = 256;
-                            foreach (var vertex in row.Vertices)
+                            foreach (Vertex vertex in row.Vertices)
                             {
                                 pointBuffer.Add((float)vertex.X);
                                 pointBuffer.Add((float)vertex.Y);
@@ -110,9 +105,9 @@ namespace WpfCloud
                 else
                 {
                     #region 无序点云
-                    MVUnity.Point3D[] pts = filereader.ReadCloud(parameters.VertexSkip);
+                    Point3D[] pts = filereader.ReadCloud(parameters.VertexSkip);
                     System.Windows.Media.Color color = parameters.PointBrush.Color;
-                    foreach (var pt in pts)
+                    foreach (Point3D pt in pts)
                     {
                         pointBuffer.Add((float)pt.X);
                         pointBuffer.Add((float)pt.Y);
@@ -259,12 +254,6 @@ namespace WpfCloud
 
                 writer.Close();
                 save.Close();
-
-                //BitmapEncoder encoder = new PngBitmapEncoder();
-                //encoder.Frames.Add(BitmapFrame.Create(IMG_DC.Source as BitmapSource));                
-                //FileStream savepng = new FileStream(filepath.Substring(0, filepath.Length - 4) + ".png",FileMode.Create);
-                //encoder.Save(savepng);
-                //savepng.Close();
             }
         }
 
@@ -283,7 +272,7 @@ namespace WpfCloud
                 {
                     string[] nodetext = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     List<Vector3> c = new List<Vector3>();
-                    foreach (var node in nodetext)
+                    foreach (string node in nodetext)
                     {
                         string[] context = node.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                         Vector3 coord = new Vector3(double.Parse(context[0]), double.Parse(context[1]), double.Parse(context[2]));
@@ -344,7 +333,7 @@ namespace WpfCloud
                     line = reader.ReadLine();
 
                     List<V3> c = new List<V3>();
-                    foreach (var node in nodetext)
+                    foreach (string node in nodetext)
                     {
                         string[] context = node.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                         V3 coord = new V3(double.Parse(context[0]), double.Parse(context[1]), double.Parse(context[2]));
