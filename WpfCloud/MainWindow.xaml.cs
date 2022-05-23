@@ -38,7 +38,7 @@ namespace WpfCloud
         private void WriteLine(string content)
         {
             string line = content + "\r\n";
-            TB_output.Text += line;
+            System.Diagnostics.Debug.WriteLine(line);
         }
         private Vector3 ConventTo(V3 vect)
         {
@@ -125,9 +125,11 @@ namespace WpfCloud
                 pcn.SetPointStyle(ps);
                 pcn.SetPoints(pointBuffer.ToArray());
                 pcn.SetColors(colorBuffer.ToArray());
-
+                V3 target = 0.5 * (filereader.Min + filereader.Max);
+                V3 came = target + V3.Identity * 200;
                 renderView.SceneManager.AddNode(pcn);
-                renderView.Renderer.SetStandardView(EnumStandardView.SV_Top);
+                renderView.View3d.SetOrbitCenter(FromV3(target));
+                renderView.Renderer.LookAt(FromV3(target), FromV3(came), Vector3.UNIT_Z);                
                 renderView.ShowWorkingGrid(false);
                 renderView.RequestDraw();
                 renderView.FitAll();
@@ -139,75 +141,13 @@ namespace WpfCloud
 
         }
 
-        private void MenuRecoPlane_Click(object sender, RoutedEventArgs e)
-        {
-            renderView.ClearScene();
-            Rectangle3D r3d = cloud.FitRec(Ransac_tolerance);
-            WriteLine(string.Format("Fitted plane norm: " + r3d.Norm.ToString("F4")));
-
-            Plane _firstFit = cloud.FindPlane_RANSAC(Ransac_tolerance, 0.2);
-            WriteLine(string.Format("Ransac plan norm: " + _firstFit.Norm.ToString("F4")));
-            V3 vert0 = _firstFit.Projection(r3d.GetVertex(0));
-            V3 vert1 = _firstFit.Projection(r3d.GetVertex(1));
-            V3 vert2 = _firstFit.Projection(r3d.GetVertex(2));
-            TopoShape line1 = GlobalInstance.BrepTools.MakeLine(ConventTo(vert0), ConventTo(vert1));
-            TopoShape line2 = GlobalInstance.BrepTools.MakeLine(ConventTo(vert1), ConventTo(vert2));
-            TopoShape quad = GlobalInstance.BrepTools.Sweep(line1, line2, true);
-            renderView.ShowGeometry(quad, 0);
-
-            Dictionary<int, double> dict_id_delta = new Dictionary<int, double>();
-            double sqd = 0;
-            foreach (KeyValuePair<int, V3> pt in cloud.Points)
-            {
-                double _d = _firstFit.AbsDistance(pt.Value);
-                dict_id_delta.Add(pt.Key, _d);
-                sqd += _d * _d;
-            }
-            sqd /= cloud.Points.Count;
-            double std = Math.Sqrt(sqd);
-
-            List<float> pointBuffer = new List<float>();
-            List<float> colorBuffer = new List<float>();
-            foreach (KeyValuePair<int, double> pt in dict_id_delta)
-            {
-                pointBuffer.Add((float)cloud.Points[pt.Key].X);
-                pointBuffer.Add((float)cloud.Points[pt.Key].Y);
-                pointBuffer.Add((float)cloud.Points[pt.Key].Z);
-                double div = dict_id_delta[pt.Key] / std;
-                if (div < Filter_tolerance)
-                {
-                    colorBuffer.Add(0f);
-                    colorBuffer.Add(0f);
-                    colorBuffer.Add(1f);
-                }
-                else if (div < Filter_tolerance * 2f)
-                {
-                    colorBuffer.Add(0f);
-                    colorBuffer.Add(1f);
-                    colorBuffer.Add(0f);
-                }
-                else
-                {
-                    colorBuffer.Add(1f);
-                    colorBuffer.Add(0f);
-                    colorBuffer.Add(0f);
-                }
-            }
-            PointCloudNode pcn = new PointCloudNode();
-            PointStyle ps = new PointStyle();
-            ps.SetMarker("plus");// circle, rect
-            ps.SetPointSize(4);
-            pcn.SetPointStyle(ps);
-            pcn.SetPoints(pointBuffer.ToArray());
-            pcn.SetColors(colorBuffer.ToArray());
-            renderView.SceneManager.AddNode(pcn);
-            renderView.RequestDraw();
-            renderView.FitAll();
-        }
-
         private void MenuNormal_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+        private Vector3 FromV3(V3 Value)
+        {
+            return new Vector3(Value.X, Value.Y, Value.Z);
         }
 
         private void OnRenderWindow_MouseClick(object sender, MouseEventArgs e)
@@ -227,11 +167,6 @@ namespace WpfCloud
         {
             renderView.SetStandardView(EnumStandardView.SV_Top);
             renderView.RequestDraw();
-        }
-
-        private void TB_Clear_Click(object sender, RoutedEventArgs e)
-        {
-            TB_output.Clear();
         }
 
         private void MenuExport_Click(object sender, RoutedEventArgs e)
@@ -255,129 +190,6 @@ namespace WpfCloud
                 writer.Close();
                 save.Close();
             }
-        }
-
-        private void MenuReadT6_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog open = new OpenFileDialog();
-            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                string filepath = open.FileName;
-                FileStream openstream = new FileStream(filepath, FileMode.Open);
-                StreamReader reader = new StreamReader(openstream);
-                string line = reader.ReadLine();
-                bool utri = true;
-                int geoID = 0;
-                while (line != "" && line != null)
-                {
-                    string[] nodetext = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    List<Vector3> c = new List<Vector3>();
-                    foreach (string node in nodetext)
-                    {
-                        string[] context = node.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        Vector3 coord = new Vector3(double.Parse(context[0]), double.Parse(context[1]), double.Parse(context[2]));
-                        c.Add(coord);
-                    }
-
-                    if (utri)
-                    {
-                        TopoShape poly1 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[0], c[1], c[3] });
-                        TopoShape poly2 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[1], c[2], c[4] });
-                        TopoShape poly3 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[1], c[3], c[4] });
-                        TopoShape poly4 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[3], c[4], c[5] });
-                        renderView.ShowGeometry(poly1, geoID++);
-                        renderView.ShowGeometry(poly2, geoID++);
-                        renderView.ShowGeometry(poly3, geoID++);
-                        renderView.ShowGeometry(poly4, geoID++);
-                    }
-                    else
-                    {
-                        TopoShape poly1 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[0], c[1], c[2] });
-                        TopoShape poly2 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[1], c[2], c[4] });
-                        TopoShape poly3 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[1], c[3], c[4] });
-                        TopoShape poly4 = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { c[2], c[4], c[5] });
-                        renderView.ShowGeometry(poly1, geoID++);
-                        renderView.ShowGeometry(poly2, geoID++);
-                        renderView.ShowGeometry(poly3, geoID++);
-                        renderView.ShowGeometry(poly4, geoID++);
-                    }
-                    utri = !utri;
-                    line = reader.ReadLine();
-                }
-                renderView.RequestDraw();
-                renderView.FitAll();
-            }
-        }
-
-        private void MenuT6ApexCoff_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog open = new OpenFileDialog();
-            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                string filepath = open.FileName;
-                FileStream openstream = new FileStream(filepath, FileMode.Open);
-                StreamReader reader = new StreamReader(openstream);
-                string line = reader.ReadLine();
-                int geoID = 0;
-                bool utri = true;
-                while (line != "" && line != null)
-                {
-                    string[] cofftext = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    double[] coff = new double[cofftext.Length];
-                    for (int i = 0; i < cofftext.Length; i++)
-                    {
-                        coff[i] = double.Parse(cofftext[i]);
-                    }
-                    line = reader.ReadLine();
-                    string[] nodetext = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                    line = reader.ReadLine();
-
-                    List<V3> c = new List<V3>();
-                    foreach (string node in nodetext)
-                    {
-                        string[] context = node.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        V3 coord = new V3(double.Parse(context[0]), double.Parse(context[1]), double.Parse(context[2]));
-                        c.Add(coord);
-                    }
-                    V3 e1, e2;
-                    if (utri)
-                    {
-                        e1 = c[2] - c[0];
-                        e2 = c[5] - c[2];
-                    }
-                    else
-                    {
-                        e1 = c[3] - c[0];
-                        e2 = c[5] - c[3];
-                    }
-                    utri = !utri;
-                    List<List<Vector3>> rows = new List<List<Vector3>>();
-                    for (int i = 0; i < parameters.Tesslation + 2; i++)
-                    {
-                        List<Vector3> row = new List<Vector3>();
-                        for (int j = 0; j < i + 1; j++)
-                        {
-                            V3 val = c[0] + e1 * (i / (double)(parameters.Tesslation + 1)) + e2 * (j / (double)(parameters.Tesslation + 1));
-                            //xy.Add(new V2(val.X, val.Y));
-                            double z = OneRegionofDI.F(val.X, val.Y, coff);
-                            row.Add(new Vector3(val.X, val.Y, z));
-                        }
-                        rows.Add(row);
-                    }
-                    for (int i = 0; i < parameters.Tesslation+1; i++)
-                    {
-                        TopoShape RowPoly1st = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { rows[i][0], rows[i + 1][0], rows[i + 1][1] });
-                        renderView.ShowGeometry(RowPoly1st, geoID++);
-                        for (int j = 0; j < i; j++)
-                        {
-                            TopoShape Utri = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { rows[i][j], rows[i][j + 1], rows[i + 1][j + 1] });
-                            TopoShape Dtri = GlobalInstance.BrepTools.MakePolygon(new List<Vector3>() { rows[i][j + 1], rows[i + 1][j + 2], rows[i + 1][j + 2] });
-                            renderView.ShowGeometry(Utri, geoID++);
-                            renderView.ShowGeometry(Dtri, geoID++);
-                        }
-                    }
-                }
-            }
-        }
+        }        
     }
 }

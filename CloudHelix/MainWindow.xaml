@@ -15,7 +15,7 @@
             <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" MinWidth="200"/>
+            <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
         <h:HelixViewport3D Name="x3d" ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" 
@@ -30,42 +30,6 @@
 
         </h:HelixViewport3D>
 
-        <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-            <ScrollViewer>
-                <StackPanel  HorizontalAlignment="Stretch" >
-                    <StackPanel.Resources>                        
-                    </StackPanel.Resources>
-                    <Grid x:Name="ModePanel" >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>                        
-                    </Grid>
-                    <ListView x:Name="List_Selection" ItemsSource="{Binding Path=SelectedInfos}">                        
-                    </ListView>
-                    <WrapPanel>
-                        <Button x:Name="BN_Search" Margin="4" ToolTip="搜索" Grid.Column="1"
-                                >
-                            <materialDesign:PackIcon Kind="SearchAdd"  Width="24" Height="24"/>
-                        </Button>
-                        <Button x:Name="BN_MergePlate" Margin="4" ToolTip="合并平面" Grid.Column="2"
-                                 >
-                            <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24"/>
-                        </Button>                        
-                    </WrapPanel>
-                    <TreeView Name="Tree_GS" ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged}"
-                              >
-                        <TreeView.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="识别" />
-                                <MenuItem Header="移除" />
-                            </ContextMenu>
-                        </TreeView.ContextMenu>
-                    </TreeView>
-                </StackPanel>
-            </ScrollViewer>
-        </materialDesign:Card>
         <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
             <WrapPanel x:Name="MainPanel">
                 <Button x:Name="BN_ReadFile" Margin="4" ToolTip="读取点云" Height="Auto" Click="BN_ReadFile_Click">
@@ -73,7 +37,10 @@
                 </Button>
                 <Button x:Name="BN_ReadModel" Margin="4" ToolTip="读取模型" Height="Auto" Click="BN_ReadModel_Click">
                     <materialDesign:PackIcon Kind="Import" Width="28" Height="28"/>
-                </Button>                
+                </Button>
+                <Button x:Name="BN_Clear" Margin="4" ToolTip="清除" Height="Auto" Click="BN_Clear_Click" >
+                    <materialDesign:PackIcon Kind="Eraser" Width="28" Height="28" />
+                </Button>
                 <Button x:Name="BN_Config" Margin="4" ToolTip="参数设置" Height="Auto"  Click="BN_Config_Click">
                     <materialDesign:PackIcon Kind="GearOutline" Width="28" Height="28" />
                 </Button>

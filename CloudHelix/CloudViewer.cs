@@ -73,12 +73,12 @@ namespace CloudHelix
 
             if (AutoLabel)
             {
-                double minX = Math.Floor(Points.Min(p => p.X) / IntervalX) * IntervalX;
-                double maxX = Math.Ceiling(Points.Max(p => p.X) / IntervalX) * IntervalX;
-                double minY = Math.Floor(Points.Min(p => p.Y) / IntervalY) * IntervalY;
-                double maxY = Math.Ceiling(Points.Max(p => p.Y) / IntervalY) * IntervalY;
-                double minZ = Math.Floor(Points.Min(p => p.Z) / IntervalZ) * IntervalZ;
-                double maxZ = Math.Ceiling(Points.Max(p => p.Z) / IntervalZ) * IntervalZ;
+                double minX = Points.Min(p => p.X);
+                double maxX = Points.Max(p => p.X);
+                double minY = Points.Min(p => p.Y);
+                double maxY = Points.Max(p => p.Y);
+                double minZ = Points.Min(p => p.Z);
+                double maxZ = Points.Max(p => p.Z);
                 ceiling = new Vector3D(maxX, maxY, maxZ);
                 floor = new Vector3D(minX, minY, minZ);
             }
@@ -171,7 +171,10 @@ namespace CloudHelix
         {
             Model3DGroup plotModel = new Model3DGroup();
             MeshBuilder axesMeshBuilder = new MeshBuilder();
-            for (double x = Floor.X; x <= Ceiling.X; x += IntervalX)
+            double minX = Math.Ceiling(Points.Min(p => p.X) / IntervalX) * IntervalX;
+            double minY = Math.Ceiling(Points.Min(p => p.Y) / IntervalY) * IntervalY;
+            double minZ = Math.Ceiling(Points.Min(p => p.Z) / IntervalZ) * IntervalZ;
+            for (double x = minX; x <= Ceiling.X; x += IntervalX)
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D(x.ToString("F0"), Brushes.Black, true, FontSize,
                                                                            new Point3D(x * Scale.X, Floor.Y * Scale.Y - (FontSize * 2.5), Floor.Z * Scale.Z),
@@ -186,7 +189,7 @@ namespace CloudHelix
                 plotModel.Children.Add(label);
             }
 
-            for (double y = Floor.Y; y <= Ceiling.Y; y += IntervalY)
+            for (double y = minY; y <= Ceiling.Y; y += IntervalY)
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D(y.ToString("F0"), Brushes.Black, true, FontSize,
                                                                            new Point3D(Floor.X * Scale.X - (FontSize * 3), y * Scale.Y, Floor.Z * Scale.Z),
@@ -199,7 +202,7 @@ namespace CloudHelix
                                                                            new Vector3D(0, 1, 0), new Vector3D(-1, 0, 0));
                 plotModel.Children.Add(label);
             }
-            for (double z = Floor.Z; z <= Ceiling.Z + double.Epsilon; z += IntervalZ)
+            for (double z = minZ; z <= Ceiling.Z + double.Epsilon; z += IntervalZ)
             {
                 GeometryModel3D label = TextCreator.CreateTextLabelModel3D(z.ToString("F0"), Brushes.Black, true, FontSize,
                                                                            new Point3D(Floor.X * Scale.X - (FontSize * 3), Ceiling.Y * Scale.Y, z * Scale.Z),
@@ -226,14 +229,17 @@ namespace CloudHelix
         {
             Model3DGroup plotModel = new Model3DGroup();
             MeshBuilder gridMeshBuilder = new MeshBuilder();
-            for (double x = Floor.X; x <= Ceiling.X; x += IntervalX)
+            double minX = Math.Ceiling(Points.Min(p => p.X) / IntervalX) * IntervalX;
+            double minY = Math.Ceiling(Points.Min(p => p.Y) / IntervalY) * IntervalY;
+            double minZ = Math.Ceiling(Points.Min(p => p.Z) / IntervalZ) * IntervalZ;
+            for (double x = minX; x <= Ceiling.X; x += IntervalX)
             {
                 gridMeshBuilder.AddQuad(new Point3D(x - (LineThickness * 0.25f), Floor.Y, Floor.Z),
                     new Point3D(x + (LineThickness * 0.25f), Floor.Y, Floor.Z),
                     new Point3D(x + (LineThickness * 0.25f), Ceiling.Y, Floor.Z),
                     new Point3D(x - (LineThickness * 0.25f), Ceiling.Y, Floor.Z));
             }
-            for (double y = Floor.Y; y <= Ceiling.Y; y += IntervalY)
+            for (double y = minY; y <= Ceiling.Y; y += IntervalY)
             {
                 gridMeshBuilder.AddQuad(new Point3D(Floor.X, y - (LineThickness * 0.25f), Floor.Z),
                     new Point3D(Floor.X, y + (LineThickness * 0.25f), Floor.Z),
