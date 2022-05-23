@@ -183,7 +183,7 @@ namespace CloudHelix
             }
 
             {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X-axis", Brushes.Black, true, FontSize,
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X (mm)", Brushes.Black, true, FontSize,
                                                                            new Point3D((Floor.X + Ceiling.X) * 0.5 * Scale.X, Floor.Y * Scale.Y - (FontSize * 6), Floor.Z * Scale.Z),
                                                                            new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
                 plotModel.Children.Add(label);
@@ -197,7 +197,7 @@ namespace CloudHelix
                 plotModel.Children.Add(label);
             }
             {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y-axis", Brushes.Black, true, FontSize,
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y (mm)", Brushes.Black, true, FontSize,
                                                                            new Point3D(Floor.X * Scale.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5 * Scale.Y, Floor.Z * Scale.Z),
                                                                            new Vector3D(0, 1, 0), new Vector3D(-1, 0, 0));
                 plotModel.Children.Add(label);
@@ -210,7 +210,7 @@ namespace CloudHelix
                 plotModel.Children.Add(label);
             }
             {
-                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z-axis", Brushes.Black, true, FontSize,
+                GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z (mm)", Brushes.Black, true, FontSize,
                                                                            new Point3D(Floor.X * Scale.X - (FontSize * 10), Ceiling.Y * Scale.Y, (Floor.Z + Ceiling.Z) * 0.5 * Scale.Z),
                                                                            new Vector3D(0, 0, 1), new Vector3D(1, 0, 0));
                 plotModel.Children.Add(label);

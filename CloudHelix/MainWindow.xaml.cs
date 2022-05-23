@@ -83,39 +83,24 @@ namespace CloudHelix
             OpenFileDialog open = new OpenFileDialog() { Filter = OpenModelFilter, Multiselect = false };
             if (open.ShowDialog() == true)
             {
+                WReadCloud readcloud = new WReadCloud(parameters);
+                if (readcloud.ShowDialog() != true)
+                {
+                    return;
+                }
+                Material mat = new DiffuseMaterial(parameters.PointBrush);
                 ModelImporter reader = new ModelImporter();
                 Model3DGroup mg = reader.Load(open.FileName);
+                foreach (Model3D child in mg.Children)
+                {
+                    if (child is GeometryModel3D g3d)
+                    {
+                        g3d.Material = mat;
+                        g3d.BackMaterial = mat;
+                    }
+                }
                 ScaleTransform3D sca = new ScaleTransform3D(parameters.Scale);
                 x3d.Children.Add(new ModelVisual3D() { Content = mg, Transform = sca });
-                //MeshGeometryModel3D model = new MeshGeometryModel3D()
-                //{
-                //    RenderWireframe = true
-                //};
-                //HelixToolkit.Wpf.SharpDX.MeshBuilder builder = new HelixToolkit.Wpf.SharpDX.MeshBuilder();
-                //foreach (Model3D m3d in mg.Children)
-                //{
-                //    if(m3d is w3d.GeometryModel3D g3d)
-                //    {
-                //        w3d.Geometry3D g = g3d.Geometry;
-                //        if(g is w3d.MeshGeometry3D mg3)
-                //        {
-                //            List<SharpDX.Vector3> verts = new List<SharpDX.Vector3>();
-                //            List<SharpDX.Vector3> norms = new List<SharpDX.Vector3>();
-                //            foreach (w3d.Point3D p in mg3.Positions)
-                //            {
-                //                verts.Add(new SharpDX.Vector3((float)p.X, (float)p.Y, (float)p.Z));
-                //            }
-                //            foreach (Vector3D n in mg3.Normals)
-                //            {
-                //                norms.Add(new SharpDX.Vector3((float)n.X, (float)n.Y, (float)n.Z));
-                //            }
-                //            builder.Append(verts, mg3.TriangleIndices, norms);
-                //        }
-                //    }
-                //}
-                //var mesh = builder.ToMeshGeometry3D();
-                //model.Geometry = mesh;
-                //x3d.Children.Add(model);
             }
         }
 
@@ -132,6 +117,11 @@ namespace CloudHelix
         private void BN_Clear_Click(object sender, RoutedEventArgs e)
         {
             cd.Points = new w3d.Point3D[0];
+        }
+
+        private void BN_SetView_Click(object sender, RoutedEventArgs e)
+        {            
+            CameraHelper.ChangeDirection(x3d.Camera, new Vector3D(1f, 1f, -1f), new Vector3D(0, 0, 1f), 2f);
         }
     }
 }

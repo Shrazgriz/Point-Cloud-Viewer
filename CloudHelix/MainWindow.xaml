@@ -26,7 +26,7 @@
             </h:HelixViewport3D.Camera>
             <h:SunLight />
             <!-- The plot visual (surface, axes and labels) -->
-            <local:CloudViewer x:Name="cd" IntervalX="200" IntervalY="200" IntervalZ="10" FontSize="10" LineThickness="6" PointSize="2" PointColor="#FFFD0707" />
+            <local:CloudViewer x:Name="cd" IntervalX="200" IntervalY="200" IntervalZ="20" FontSize="16" LineThickness="4" PointSize="2" PointColor="#FFFD0707" />
 
         </h:HelixViewport3D>
 
@@ -40,6 +40,9 @@
                 </Button>
                 <Button x:Name="BN_Clear" Margin="4" ToolTip="清除" Height="Auto" Click="BN_Clear_Click" >
                     <materialDesign:PackIcon Kind="Eraser" Width="28" Height="28" />
+                </Button>
+                <Button x:Name="BN_SetView" Margin="4" ToolTip="重置视角" Height="Auto" Click="BN_SetView_Click" >
+                    <materialDesign:PackIcon Kind="AxisArrow" Width="28" Height="28" />
                 </Button>
                 <Button x:Name="BN_Config" Margin="4" ToolTip="参数设置" Height="Auto"  Click="BN_Config_Click">
                     <materialDesign:PackIcon Kind="GearOutline" Width="28" Height="28" />
