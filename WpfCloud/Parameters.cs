@@ -5,7 +5,7 @@ using MVUnity;
 
 namespace WpfCloud
 {
-    public class Parameters //: INotifyPropertyChanged
+    public class Parameters : INotifyPropertyChanged
     {
         private int stiffResX;
         private int stiffResY;
@@ -20,13 +20,13 @@ namespace WpfCloud
         private double maxGap;
         private double rhoTolerance;
         private string cloudFilePath;
-        private SolidColorBrush pointColor;
+        private Color pointColor;
         private int pointSize;
         private int minRegionCellCount;
         private double minRegionArea;
         private double mergeRation;
         private double searchDistance;
-        //public event PropertyChangedEventHandler PropertyChanged;
+        
         public int StiffResX { get => stiffResX; set => stiffResX = value; }
         public int StiffResY { get => stiffResY; set => stiffResY = value; }
         public double CellNormTol { get => cellNormTol; set => cellNormTol = value; }
@@ -40,16 +40,13 @@ namespace WpfCloud
         public double MaxGap { get => maxGap; set => maxGap = value; }
         public double RhoTolerance { get => rhoTolerance; set => rhoTolerance = value; }
         public string CloudFilePath { get => cloudFilePath; set => cloudFilePath = value; }
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public SolidColorBrush PointBrush
         {
-            get => pointColor;
-            set
+            get
             {
-                if (pointColor != value)
-                {
-                    pointColor = value;
-                    //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PointBrush)));
-                }
+                return new SolidColorBrush(pointColor);
             }
         }
         public int PointSize { get => pointSize; set => pointSize = value; }
@@ -58,6 +55,20 @@ namespace WpfCloud
         public double MergeRation { get => mergeRation; set => mergeRation = value; }
         public double BoundarySearchWidth { get => searchDistance; set => searchDistance = value; }
         public int Tesslation { get; set; }
+        public Color PointColor
+        {
+            get
+            {
+                return pointColor;
+            }
+            set
+            {
+                pointColor = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("PointColor"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("PointBrush"));
+            }
+        }
+
         public Parameters()
         {
             RhoTolerance = double.Parse(ConfigurationManager.AppSettings["RhoTolerance"]);
@@ -74,8 +85,7 @@ namespace WpfCloud
             VertexSkip = int.Parse(ConfigurationManager.AppSettings["VertexSkip"]);
             PointSize = int.Parse(ConfigurationManager.AppSettings["PointSize"]);
             string burshString = ConfigurationManager.AppSettings["PointBrush"];
-            Color pointcolor = (Color)ColorConverter.ConvertFromString(burshString);
-            PointBrush = new SolidColorBrush(pointcolor);
+            PointColor = (Color)ColorConverter.ConvertFromString(burshString);
             MinRegionArea = double.Parse(ConfigurationManager.AppSettings["MinRegionArea"]);
             MinRegionCellCount = int.Parse(ConfigurationManager.AppSettings["MinRegionCellCount"]);
             MergeRation = double.Parse(ConfigurationManager.AppSettings["MergeRation"]);

@@ -11,7 +11,7 @@
         Title="点云数据智能处理" Height="720" Width="1280" FontSize="16" FontWeight="Bold">
     <Grid x:Name="MajorGrid">
         <Grid.RowDefinitions>
-            <RowDefinition MaxHeight="60"/>
+            <RowDefinition Height="1*" MaxHeight="60"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
@@ -23,11 +23,21 @@
             <wf:Panel x:Name="canvas" AutoSize="True" Dock="Fill" Resize="Canvas_Resize"></wf:Panel>
         </wfi:WindowsFormsHost>
         <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
-            <WrapPanel x:Name="MainPanel">
-                <Button x:Name="menuReadCloud" Content="读取点云" Margin="4 " Style="{StaticResource MaterialDesignRaisedButton}"
-                            Click="MenuReadCloud_Click"/>
-                <Button x:Name="menuExport" Content="模型输出" Margin=" 4" Style="{StaticResource MaterialDesignRaisedButton}"
-                            Click="MenuExport_Click"/>                
+            <WrapPanel x:Name="MainPanel" VerticalAlignment="Center">
+                <Button x:Name="menuReadCloud"  Margin="4 " Height="Auto" 
+                            Click="MenuReadCloud_Click">
+                    <materialDesign:PackIcon Kind="FolderOpenOutline" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_ReadModel" Margin="4" ToolTip="读取模型" Height="Auto" Click="BN_ReadModel_Click">
+                    <materialDesign:PackIcon Kind="Import" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_AnaPlane" Margin="4" ToolTip="平面分析" Click="BN_AnalyzePlane_Click"  Height="Auto" >
+                    <materialDesign:PackIcon Kind="MapSearchOutline" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="menuExport" Content="模型输出" Margin=" 4" 
+                            Click="MenuExport_Click">
+                    
+                </Button>
             </WrapPanel>
         </materialDesign:Card>
         <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">

@@ -1,26 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+﻿using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace WpfCloud
 {
     /// <summary>
     /// WReadcloud.xaml 的交互逻辑
     /// </summary>
-    public partial class WReadcloud : Window
+    public partial class WReadCloud : Window
     {
         public Parameters Parameters { get; private set; }
-        public WReadcloud(Parameters parameters)
+        public WReadCloud(Parameters parameters)
         {
             InitializeComponent();
             Parameters = parameters;
@@ -47,8 +36,8 @@ namespace WpfCloud
                 Color = System.Drawing.Color.Black
             };
             cd.ShowDialog();
-            Parameters.PointBrush = new SolidColorBrush(Color.FromArgb(cd.Color.A, cd.Color.R, cd.Color.G, cd.Color.B));
-            Rec_Brush.Fill = new SolidColorBrush(Color.FromArgb(cd.Color.A, cd.Color.R, cd.Color.G, cd.Color.B));
+            Parameters.PointColor = Color.FromArgb(cd.Color.A, cd.Color.R, cd.Color.G, cd.Color.B);
+            //Rec_Brush.Fill = new SolidColorBrush(Color.FromArgb(cd.Color.A, cd.Color.R, cd.Color.G, cd.Color.B));
         }
     }
 }
