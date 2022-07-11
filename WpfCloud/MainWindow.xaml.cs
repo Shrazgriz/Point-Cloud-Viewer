@@ -4,13 +4,13 @@ using System.Windows;
 using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
-using w3d = System.Windows.Media.Media3D;
 using AnyCAD.Platform;
 using AnyCAD.Presentation;
 using MVUnity;
 using MVUnity.PointCloud;
 using MVUnity.Geometry3D;
 using System.Linq;
+using System.Configuration;
 
 namespace WpfCloud
 {
@@ -65,6 +65,8 @@ namespace WpfCloud
             OpenFileDialog open = new OpenFileDialog();
             if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                parameters.CloudFilePath = open.FileName;
+                renderView.SceneManager.ClearNodes();
                 WReadCloud readcloud = new WReadCloud(parameters);
                 if (readcloud.ShowDialog() != true) return;
                 
@@ -334,7 +336,7 @@ namespace WpfCloud
                 }
                 List<List<CompiledRegion>> groups = DBScan.ClusteringRegions(regions.FindAll(r => r.CellCount > CloudConstants.MinRegionCellCount).ToList());
 
-                List<u3d.Polygon3D> rects = new List<u3d.Polygon3D>();
+                List<Polygon3D> rects = new List<Polygon3D>();
                 for (int i = 0; i < groups.Count; i++)
                 {
                     if (groups[i].Count == 1)
@@ -349,7 +351,7 @@ namespace WpfCloud
                         {
                             recBounds.AddRange(reg.Boundary.GetAllVertice());
                         }
-                        u3d.Polygon3D bound = u3d.Polygon3D.BoundingPoly(recBounds);
+                        Polygon3D bound = Polygon3D.BoundingPoly(recBounds);
 
                         double area1 = bound.GetArea();
                         double area2 = groups[i].Select(r => r.Boundary.GetArea()).Sum();
@@ -365,19 +367,53 @@ namespace WpfCloud
                 }
                 #endregion
                 #region 平面可视化
-                FittedPoly = new List<Entity>();
                 int id = 0;
-                foreach (u3d.Polygon3D rect in rects)
+                foreach (Polygon3D rect in rects)
                 {
-                    FittedPoly.Add(new Plate(rect, id++));
-                }
-                ShowPolys();
+                    TopoShape face = PolygonToFace(rect);
+                    renderView.ShowGeometry(face, ++id);
+                }                                
                 #endregion
 
                 WriteLine(string.Format("Region count: {0}", regions.Count));
                 WriteLine(string.Format("Filted count: {0}", regions.FindAll(r => r.CellCount > CloudConstants.MinRegionCellCount && r.EstimatedArea > CloudConstants.MinRegionArea).Count));
                 WriteLine(string.Format("Clusters count: {0}", groups.Count));
             }
+        }
+
+        private TopoShape PolygonToFace( Polygon3D Poly)
+        {
+            List<Vector3> points = Poly.GetAllVertice().Select(v => new Vector3(v.X, v.Y, v.Z)).ToList();
+            TopoShape plygon = GlobalInstance.BrepTools.MakePolygon(points);
+            TopoShape face = GlobalInstance.BrepTools.MakeFace(plygon);
+            return face;
+        }
+
+        private void MainForm_Closed(object sender, EventArgs e)
+        {
+            Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            cfa.AppSettings.Settings["CloudFormat"].Value = parameters.Cloudformat;
+            cfa.AppSettings.Settings["CloudScale"].Value = parameters.Cloudscale.ToString("F2");
+            cfa.AppSettings.Settings["RhoTolerance"].Value = parameters.RhoTolerance.ToString("F2");
+            cfa.AppSettings.Settings["MaxSewGap"].Value = parameters.MaxGap.ToString("F2");
+            cfa.AppSettings.Settings["CloudFormat"].Value = parameters.Cloudformat;
+            cfa.AppSettings.Settings["CloudScale"].Value = parameters.Cloudscale.ToString("F2");
+            cfa.AppSettings.Settings["PlaneNormTolerance"].Value = parameters.PlaneNormTol.ToString("F2");
+            cfa.AppSettings.Settings["PlaneRhoTolerance"].Value = parameters.PlaneRhoTol.ToString("F2");
+            cfa.AppSettings.Settings["CellNormTolerance"].Value = parameters.CellNormTol.ToString("F2");
+            cfa.AppSettings.Settings["CellRhoTolerance"].Value = parameters.CellRhoTol.ToString("F2");
+            cfa.AppSettings.Settings["StiffResolutionX"].Value = parameters.StiffResX.ToString();
+            cfa.AppSettings.Settings["StiffResolutionY"].Value = parameters.StiffResY.ToString();
+            cfa.AppSettings.Settings["RowSkip"].Value = parameters.RowSkip.ToString();
+            cfa.AppSettings.Settings["VertexSkip"].Value = parameters.VertexSkip.ToString();
+            cfa.AppSettings.Settings["PointSize"].Value = parameters.PointSize.ToString();
+            cfa.AppSettings.Settings["PointBrush"].Value = parameters.PointBrush.ToString();
+            cfa.AppSettings.Settings["MinRegionArea"].Value = parameters.MinRegionArea.ToString();
+            cfa.AppSettings.Settings["MinRegionCellCount"].Value = parameters.MinRegionCellCount.ToString();
+            cfa.AppSettings.Settings["MergeRation"].Value = parameters.MergeRation.ToString();
+            cfa.AppSettings.Settings["BoundarySearchDistance"].Value = parameters.BoundarySearchWidth.ToString();
+            //cfa.AppSettings.Settings["SimplifyAreaRation"].Value = parameters.SimplifyAreaRation.ToString();
+            cfa.Save();
         }
     }
 }

@@ -83,6 +83,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters.cs" />
+    <Compile Include="DBScan.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="WReadcloud.xaml.cs">
       <DependentUpon>WReadcloud.xaml</DependentUpon>

@@ -37,7 +37,6 @@ namespace WpfCloud
             };
             cd.ShowDialog();
             Parameters.PointColor = Color.FromArgb(cd.Color.A, cd.Color.R, cd.Color.G, cd.Color.B);
-            //Rec_Brush.Fill = new SolidColorBrush(Color.FromArgb(cd.Color.A, cd.Color.R, cd.Color.G, cd.Color.B));
         }
     }
 }
