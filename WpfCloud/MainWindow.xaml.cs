@@ -35,6 +35,7 @@ namespace WpfCloud
             renderView.Dock = DockStyle.Fill;
             renderView.MouseClick += new MouseEventHandler(OnRenderWindow_MouseClick);
             parameters = new Parameters();
+            GlobalInstance.EventListener.OnSelectElementEvent += OnSelectElement;
         }
 
         private void WriteLine(string content)
@@ -58,6 +59,26 @@ namespace WpfCloud
         private void Wfhost_SizeChanged(object sender, SizeChangedEventArgs e)
         {
 
+        }
+
+        private void OnSelectElement(SelectionChangeArgs args)
+        {
+            if (!args.IsHighlightMode())
+            {
+                SelectedShapeQuery query = new SelectedShapeQuery();
+                renderView.QuerySelection(query);
+                var shape = query.GetGeometry();
+                if (shape != null)
+                {
+                    GeomCurve curve = new GeomCurve();
+                    if (curve.Initialize(shape))
+                    {
+                        TopoShapeProperty property = new TopoShapeProperty();
+                        property.SetShape(shape);
+                        Console.WriteLine("Edge Length {0}", property.EdgeLength());
+                    }
+                }
+            }
         }
 
         private void MenuReadCloud_Click(object sender, RoutedEventArgs e)
@@ -123,6 +144,7 @@ namespace WpfCloud
                     #endregion
                 }
                 PointCloudNode pcn = new PointCloudNode();
+                pcn.SetPickable(false);
                 PointStyle ps = new PointStyle();
                 ps.SetMarker("rect");// circle, rect
                 ps.SetPointSize(4);
@@ -152,14 +174,11 @@ namespace WpfCloud
 
         private void OnRenderWindow_MouseClick(object sender, MouseEventArgs e)
         {
-            if (!m_PickPoint)
-                return;
-
-            // Try the grid
-            Vector3 pt = renderView.HitPointOnGrid(e.X, e.Y);
-            if (pt != null)
+            PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
+            if (pickHelper != null)
             {
-                WriteLine(string.Format("Click on X: {0}, Y:{1}", e.X, e.Y));
+                SceneNode pNode = pickHelper.GetSceneNode();
+                TopoShape pGeo = pickHelper.GetGeometry();
             }
         }
 
@@ -371,7 +390,13 @@ namespace WpfCloud
                 foreach (Polygon3D rect in rects)
                 {
                     TopoShape face = PolygonToFace(rect);
-                    renderView.ShowGeometry(face, ++id);
+                    RenderableGeometry entity = new RenderableGeometry();
+                    entity.SetGeometry(face);
+                    entity.SetId(++id);
+                    EntitySceneNode node = new EntitySceneNode();
+                    node.SetEntity(entity);
+                    renderView.SceneManager.AddNode(node);
+                    //renderView.ShowGeometry(face, ++id);
                 }                                
                 #endregion
 
