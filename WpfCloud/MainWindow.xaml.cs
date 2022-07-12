@@ -238,13 +238,18 @@ namespace WpfCloud
                 //                                                           new Vector3D(0, 0, 1), new Vector3D(1, 0, 0));
                 plotModel.AddNode(label);
             }
-            RenderableGeometry bb = new BrepTools().MakeBox();
-            Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
-                (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
-            axesMeshBuilder.AddBoundingBox(bb, LineThickness);
-            GeometryModel3D axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
-            axesModel.SetName(AxisName);
-            plotModel.Children.Add(axesModel);
+            var center = box.GetCenter();
+            RenderableGeometry bb = new RenderableGeometry();
+            bb.SetGeometry(new BrepTools().MakeBox(new Vector3(box.MinPt.X, center.Y, center.Z), Vector3.UNIT_X, box.MaxPt - box.MinPt));
+            EntitySceneNode axesnode = new EntitySceneNode();
+            axesnode.SetEntity(bb);
+            axesnode.SetPickable(false);
+            //Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
+            //    (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
+            //axesMeshBuilder.AddBoundingBox(bb, LineThickness);
+            //GeometryModel3D axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
+            //axesModel.SetName(AxisName);
+            plotModel.AddNode(axesnode);
             return plotModel;
         }
 
