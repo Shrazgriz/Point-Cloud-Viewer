@@ -145,12 +145,17 @@ namespace WpfCloud
                 }
                 PointCloudNode pcn = new PointCloudNode();
                 pcn.SetPickable(false);
+                pcn.ComputeBBox();
                 PointStyle ps = new PointStyle();
                 ps.SetMarker("rect");// circle, rect
                 ps.SetPointSize(4);
                 pcn.SetPointStyle(ps);
                 pcn.SetPoints(pointBuffer.ToArray());
                 pcn.SetColors(colorBuffer.ToArray());
+                #region
+                AABox bbox = pcn.GetBBox();
+                
+                #endregion
                 V3 target = 0.5 * (filereader.Min + filereader.Max);
                 V3 came = target + V3.Identity * 200;
                 renderView.SceneManager.AddNode(pcn);
@@ -160,6 +165,87 @@ namespace WpfCloud
                 renderView.RequestDraw();
                 renderView.FitAll();
             }
+        }
+
+        private GroupSceneNode DrawBoundBox(AABox box, int IntervalX, int IntervalY, int IntervalZ, int FontSize)
+        {
+            GroupSceneNode plotModel = new GroupSceneNode();
+            double minX = Math.Ceiling(box.MinPt.X / IntervalX) * IntervalX;
+            double minY = Math.Ceiling(box.MinPt.Y / IntervalY) * IntervalY;
+            double minZ = Math.Ceiling(box.MinPt.Z / IntervalZ) * IntervalZ;
+            for (double x = minX; x <= box.MaxPt.X; x += IntervalX)
+            {
+                TextNode label = new TextNode();
+                label.SetText(x.ToString("F0"));
+                label.SetPickable(false);
+                label.SetPosition(new Vector3(x, box.MinPt.Y - (FontSize * 2.5), box.MinPt.Z));
+                //TextCreator.CreateTextLabelModel3D(x.ToString("F0"), Brushes.Black, true, FontSize,
+                //                                                           new Point3D(x * Scale.X, Floor.Y * Scale.Y - (FontSize * 2.5), Floor.Z * Scale.Z),
+                //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
+                plotModel.AddNode(label);
+            }
+
+            {
+                TextNode label = new TextNode();
+                label.SetText("X(mm)");
+                label.SetPickable(false);
+                label.SetPosition(new Vector3((box.MinPt.X + box.MaxPt.X) * 0.5, box.MinPt.Y - (FontSize * 6), box.MinPt.Z));
+                //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X (mm)", Brushes.Black, true, FontSize,
+                //                                                           new Point3D((Floor.X + Ceiling.X) * 0.5 * Scale.X, Floor.Y * Scale.Y - (FontSize * 6), Floor.Z * Scale.Z),
+                //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
+                plotModel.AddNode(label);
+            }
+
+            for (double y = minY; y <= box.MaxPt.Y; y += IntervalY)
+            {
+                TextNode label = new TextNode();
+                label.SetText(y.ToString("F0"));
+                label.SetPickable(false);
+                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 3, y, box.MinPt.Z));
+                //GeometryModel3D label = TextCreator.CreateTextLabelModel3D(y.ToString("F0"), Brushes.Black, true, FontSize,
+                //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), y * Scale.Y, Floor.Z * Scale.Z),
+                //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
+                plotModel.AddNode(label);
+            }
+            {
+                TextNode label = new TextNode();
+                label.SetText("Y(mm)");
+                label.SetPickable(false);
+                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 6, (box.MinPt.Y + box.MaxPt.Y) * 0.5, box.MinPt.Z));
+                //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y (mm)", Brushes.Black, true, FontSize,
+                //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5 * Scale.Y, Floor.Z * Scale.Z),
+                //                                                           new Vector3D(0, 1, 0), new Vector3D(-1, 0, 0));
+                plotModel.AddNode(label);
+            }
+            for (double z = minZ; z <= box.MaxPt.Z + double.Epsilon; z += IntervalZ)
+            {
+                TextNode label = new TextNode();
+                label.SetText(z.ToString("F0"));
+                label.SetPickable(false);
+                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 3, box.MaxPt.Y, z));
+                //GeometryModel3D label = TextCreator.CreateTextLabelModel3D(z.ToString("F0"), Brushes.Black, true, FontSize,
+                //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), Ceiling.Y * Scale.Y, z * Scale.Z),
+                //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 0, 1));
+                plotModel.AddNode(label);
+            }
+            {
+                TextNode label = new TextNode();
+                label.SetText("Z(mm)");
+                label.SetPickable(false);
+                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 6, box.MinPt.Y, (box.MinPt.Z + box.MaxPt.Z) * 0.5));
+                //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z (mm)", Brushes.Black, true, FontSize,
+                //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), Ceiling.Y * Scale.Y, (Floor.Z + Ceiling.Z) * 0.5 * Scale.Z),
+                //                                                           new Vector3D(0, 0, 1), new Vector3D(1, 0, 0));
+                plotModel.AddNode(label);
+            }
+            RenderableGeometry bb = new BrepTools().MakeBox();
+            Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
+                (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
+            axesMeshBuilder.AddBoundingBox(bb, LineThickness);
+            GeometryModel3D axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
+            axesModel.SetName(AxisName);
+            plotModel.Children.Add(axesModel);
+            return plotModel;
         }
 
         private void Canvas_Resize(object sender, EventArgs e)
