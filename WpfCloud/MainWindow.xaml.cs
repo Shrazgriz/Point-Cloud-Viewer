@@ -145,7 +145,7 @@ namespace WpfCloud
                 }
                 PointCloudNode pcn = new PointCloudNode();
                 pcn.SetPickable(false);
-                pcn.ComputeBBox();
+                //pcn.ComputeBBox();
                 PointStyle ps = new PointStyle();
                 ps.SetMarker("rect");// circle, rect
                 ps.SetPointSize(4);
@@ -153,8 +153,8 @@ namespace WpfCloud
                 pcn.SetPoints(pointBuffer.ToArray());
                 pcn.SetColors(colorBuffer.ToArray());
                 #region
-                AABox bbox = pcn.GetBBox();
-                
+                GroupSceneNode bbox = DrawBoundBox(V3toVect(filereader.Min), V3toVect(filereader.Max), 500, 500, 500, 12);
+                renderView.SceneManager.AddNode(bbox);
                 #endregion
                 V3 target = 0.5 * (filereader.Min + filereader.Max);
                 V3 came = target + V3.Identity * 200;
@@ -167,18 +167,22 @@ namespace WpfCloud
             }
         }
 
-        private GroupSceneNode DrawBoundBox(AABox box, int IntervalX, int IntervalY, int IntervalZ, int FontSize)
+        private Vector3 V3toVect(V3 value)
+        {
+            return new Vector3(value.X, value.Y, value.Z);
+        }
+        private GroupSceneNode DrawBoundBox(Vector3 MinPt, Vector3 MaxPt, int IntervalX, int IntervalY, int IntervalZ, int FontSize)
         {
             GroupSceneNode plotModel = new GroupSceneNode();
-            double minX = Math.Ceiling(box.MinPt.X / IntervalX) * IntervalX;
-            double minY = Math.Ceiling(box.MinPt.Y / IntervalY) * IntervalY;
-            double minZ = Math.Ceiling(box.MinPt.Z / IntervalZ) * IntervalZ;
-            for (double x = minX; x <= box.MaxPt.X; x += IntervalX)
+            double minX = Math.Ceiling(MinPt.X / IntervalX) * IntervalX;
+            double minY = Math.Ceiling(MinPt.Y / IntervalY) * IntervalY;
+            double minZ = Math.Ceiling(MinPt.Z / IntervalZ) * IntervalZ;
+            for (double x = minX; x <= MaxPt.X; x += IntervalX)
             {
                 TextNode label = new TextNode();
                 label.SetText(x.ToString("F0"));
                 label.SetPickable(false);
-                label.SetPosition(new Vector3(x, box.MinPt.Y - (FontSize * 2.5), box.MinPt.Z));
+                label.SetPosition(new Vector3(x , MinPt.Y  - (FontSize * 2.5), MinPt.Z ));
                 //TextCreator.CreateTextLabelModel3D(x.ToString("F0"), Brushes.Black, true, FontSize,
                 //                                                           new Point3D(x * Scale.X, Floor.Y * Scale.Y - (FontSize * 2.5), Floor.Z * Scale.Z),
                 //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
@@ -189,19 +193,19 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText("X(mm)");
                 label.SetPickable(false);
-                label.SetPosition(new Vector3((box.MinPt.X + box.MaxPt.X) * 0.5, box.MinPt.Y - (FontSize * 6), box.MinPt.Z));
+                label.SetPosition(new Vector3((MinPt.X + MaxPt.X) *  0.5, MinPt.Y - (FontSize * 6), MinPt.Z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X (mm)", Brushes.Black, true, FontSize,
                 //                                                           new Point3D((Floor.X + Ceiling.X) * 0.5 * Scale.X, Floor.Y * Scale.Y - (FontSize * 6), Floor.Z * Scale.Z),
                 //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
                 plotModel.AddNode(label);
             }
 
-            for (double y = minY; y <= box.MaxPt.Y; y += IntervalY)
+            for (double y = minY; y <= MaxPt.Y; y += IntervalY)
             {
                 TextNode label = new TextNode();
                 label.SetText(y.ToString("F0"));
                 label.SetPickable(false);
-                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 3, y, box.MinPt.Z));
+                label.SetPosition(new Vector3(MinPt.X  - FontSize * 3, y , MinPt.Z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D(y.ToString("F0"), Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), y * Scale.Y, Floor.Z * Scale.Z),
                 //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
@@ -211,18 +215,18 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText("Y(mm)");
                 label.SetPickable(false);
-                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 6, (box.MinPt.Y + box.MaxPt.Y) * 0.5, box.MinPt.Z));
+                label.SetPosition(new Vector3(MinPt.X  - FontSize * 6, (MinPt.Y + MaxPt.Y) * 0.5, MinPt.Z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y (mm)", Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5 * Scale.Y, Floor.Z * Scale.Z),
                 //                                                           new Vector3D(0, 1, 0), new Vector3D(-1, 0, 0));
                 plotModel.AddNode(label);
             }
-            for (double z = minZ; z <= box.MaxPt.Z + double.Epsilon; z += IntervalZ)
+            for (double z = minZ; z <= MaxPt.Z + double.Epsilon; z += IntervalZ)
             {
                 TextNode label = new TextNode();
                 label.SetText(z.ToString("F0"));
                 label.SetPickable(false);
-                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 3, box.MaxPt.Y, z));
+                label.SetPosition(new Vector3(MinPt.X  - FontSize * 3, MaxPt.Y , z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D(z.ToString("F0"), Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), Ceiling.Y * Scale.Y, z * Scale.Z),
                 //                                                           new Vector3D(1, 0, 0), new Vector3D(0, 0, 1));
@@ -232,24 +236,80 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText("Z(mm)");
                 label.SetPickable(false);
-                label.SetPosition(new Vector3(box.MinPt.X - FontSize * 6, box.MinPt.Y, (box.MinPt.Z + box.MaxPt.Z) * 0.5));
+                label.SetPosition(new Vector3(MinPt.X  - FontSize * 6, MinPt.Y , (MinPt.Z + MaxPt.Z)  * 0.5));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z (mm)", Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), Ceiling.Y * Scale.Y, (Floor.Z + Ceiling.Z) * 0.5 * Scale.Z),
                 //                                                           new Vector3D(0, 0, 1), new Vector3D(1, 0, 0));
                 plotModel.AddNode(label);
             }
-            var center = box.GetCenter();
-            RenderableGeometry bb = new RenderableGeometry();
-            bb.SetGeometry(new BrepTools().MakeBox(new Vector3(box.MinPt.X, center.Y, center.Z), Vector3.UNIT_X, box.MaxPt - box.MinPt));
-            EntitySceneNode axesnode = new EntitySceneNode();
-            axesnode.SetEntity(bb);
-            axesnode.SetPickable(false);
+
+            LineStyle lineStyle = new LineStyle();
+            lineStyle.SetColor(new ColorValue(0f, 0f, 0f));
+            lineStyle.SetLineWidth(2);
+            lineStyle.SetPatternStyle((int)EnumLinePattern.LP_None);
+            {
+                //Z
+                LineNode lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MinPt.Z), new Vector3(MinPt.X, MinPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MaxPt.X, MinPt.Y, MinPt.Z), new Vector3(MaxPt.X, MinPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MaxPt.X, MaxPt.Y, MinPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MaxPt.Y, MinPt.Z), new Vector3(MinPt.X, MaxPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+            }
+            {
+                //Y
+                LineNode lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MinPt.Z), new Vector3(MinPt.X, MaxPt.Y, MinPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MaxPt.X, MinPt.Y, MinPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MinPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MaxPt.X, MinPt.Y, MaxPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MaxPt.Z), new Vector3(MinPt.X, MaxPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+            }
+            {
+                //X
+                LineNode lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MinPt.Z), new Vector3(MaxPt.X, MinPt.Y, MinPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MaxPt.Y, MinPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MinPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MaxPt.Z), new Vector3(MaxPt.X, MinPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+                lineNode = new LineNode();
+                lineNode.Set(new Vector3(MinPt.X, MaxPt.Y, MaxPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MaxPt.Z));
+                lineNode.SetLineStyle(lineStyle);
+                plotModel.AddNode(lineNode);
+            }
+
             //Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
             //    (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
             //axesMeshBuilder.AddBoundingBox(bb, LineThickness);
             //GeometryModel3D axesModel = new GeometryModel3D(axesMeshBuilder.ToMesh(), Materials.Black);
             //axesModel.SetName(AxisName);
-            plotModel.AddNode(axesnode);
             return plotModel;
         }
 
