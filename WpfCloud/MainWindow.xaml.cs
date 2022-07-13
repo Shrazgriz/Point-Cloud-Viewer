@@ -25,10 +25,10 @@ namespace WpfCloud
         private Parameters parameters;
         private Cloud3D cloud;
         private PointCloudNode CloudNode;
-        bool m_PickPoint = true;
+        bool mousPick = false;
 
         Color[] colors = new Color[6] { Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Purple, Color.Aqua };
-        private ObservableCollection<SceneNode> UserSelection;
+        private ObservableCollection<NodeInfo> UserSelection;
         public MainWindow()
         {
             InitializeComponent();
@@ -37,7 +37,7 @@ namespace WpfCloud
             renderView.MouseClick += new MouseEventHandler(OnRenderWindow_MouseClick);
             parameters = new Parameters();
             GlobalInstance.EventListener.OnSelectElementEvent += OnSelectElement;
-            UserSelection = new ObservableCollection<SceneNode>();
+            UserSelection = new ObservableCollection<NodeInfo>();
             LV_Selection.ItemsSource = UserSelection;
         }
 
@@ -257,18 +257,22 @@ namespace WpfCloud
                 LineNode lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MinPt.Z), new Vector3(MinPt.X, MinPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MaxPt.X, MinPt.Y, MinPt.Z), new Vector3(MaxPt.X, MinPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MaxPt.X, MaxPt.Y, MinPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MaxPt.Y, MinPt.Z), new Vector3(MinPt.X, MaxPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
             }
             {
@@ -276,18 +280,22 @@ namespace WpfCloud
                 LineNode lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MinPt.Z), new Vector3(MinPt.X, MaxPt.Y, MinPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MaxPt.X, MinPt.Y, MinPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MinPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MaxPt.X, MinPt.Y, MaxPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MaxPt.Z), new Vector3(MinPt.X, MaxPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
             }
             {
@@ -295,21 +303,25 @@ namespace WpfCloud
                 LineNode lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MinPt.Z), new Vector3(MaxPt.X, MinPt.Y, MinPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MaxPt.Y, MinPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MinPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MinPt.Y, MaxPt.Z), new Vector3(MaxPt.X, MinPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
                 lineNode = new LineNode();
                 lineNode.Set(new Vector3(MinPt.X, MaxPt.Y, MaxPt.Z), new Vector3(MaxPt.X, MaxPt.Y, MaxPt.Z));
                 lineNode.SetLineStyle(lineStyle);
+                lineNode.SetPickable(false);
                 plotModel.AddNode(lineNode);
             }
-
+            plotModel.SetName("BoundingBox");
             //Rect3D bb = new Rect3D(Floor.X * Scale.X, Floor.Y * Scale.Y, Floor.Z * Scale.Z,
             //    (Ceiling.X - Floor.X) * Scale.X, (Ceiling.Y - Floor.Y) * Scale.Y, (Ceiling.Z - Floor.Z) * Scale.Z);
             //axesMeshBuilder.AddBoundingBox(bb, LineThickness);
@@ -330,23 +342,26 @@ namespace WpfCloud
 
         private void OnRenderWindow_MouseClick(object sender, MouseEventArgs e)
         {
-            PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
-            if (pickHelper != null)
+            if (mousPick)
             {
-                SceneNode pNode = pickHelper.GetSceneNode();
-                TopoShape pGeo = pickHelper.GetGeometry();
-                UserSelection.Add(pNode);
+                PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
+                if (pickHelper != null)
+                {
+                    SceneNode pNode = pickHelper.GetSceneNode();
+                    TopoShape pGeo = pickHelper.GetGeometry();
+                    NodeInfo info = new NodeInfo(pNode);
+                    info.Name = pGeo.ToString();
+                    UserSelection.Add(info);
+                }
             }
             else
             {
-                UserSelection.Clear();
+                PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
+                if (pickHelper == null)
+                {
+                    UserSelection.Clear();
+                }
             }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            renderView.SetStandardView(EnumStandardView.SV_Top);
-            renderView.RequestDraw();
         }
 
         private void MenuExport_Click(object sender, RoutedEventArgs e)
@@ -620,6 +635,36 @@ namespace WpfCloud
         private void BN_Trim_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void MainForm_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case System.Windows.Input.Key.LeftCtrl:
+                    mousPick = true;
+                    break;
+                case System.Windows.Input.Key.RightCtrl:
+                    mousPick = true;
+                    break;                
+                default:
+                    break;
+            }
+        }
+
+        private void MainForm_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case System.Windows.Input.Key.LeftCtrl:
+                    mousPick = false;
+                    break;
+                case System.Windows.Input.Key.RightCtrl:
+                    mousPick = false;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
