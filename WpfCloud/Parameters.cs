@@ -26,7 +26,9 @@ namespace WpfCloud
         private double minRegionArea;
         private double mergeRation;
         private double searchDistance;
-        
+        private int intervalX;
+        private int intervalY;
+        private int intervalZ;
         public int StiffResX { get => stiffResX; set => stiffResX = value; }
         public int StiffResY { get => stiffResY; set => stiffResY = value; }
         public double CellNormTol { get => cellNormTol; set => cellNormTol = value; }
@@ -69,6 +71,10 @@ namespace WpfCloud
             }
         }
 
+        public int IntervalZ { get => intervalZ; set => intervalZ = value; }
+        public int IntervalY { get => intervalY; set => intervalY = value; }
+        public int IntervalX { get => intervalX; set => intervalX = value; }
+
         public Parameters()
         {
             RhoTolerance = double.Parse(ConfigurationManager.AppSettings["RhoTolerance"]);
@@ -90,6 +96,9 @@ namespace WpfCloud
             MinRegionCellCount = int.Parse(ConfigurationManager.AppSettings["MinRegionCellCount"]);
             MergeRation = double.Parse(ConfigurationManager.AppSettings["MergeRation"]);
             BoundarySearchWidth = double.Parse(ConfigurationManager.AppSettings["BoundarySearchDistance"]);
+            IntervalX = int.Parse(ConfigurationManager.AppSettings["IntervalX"]);
+            IntervalY = int.Parse(ConfigurationManager.AppSettings["IntervalY"]);
+            IntervalZ = int.Parse(ConfigurationManager.AppSettings["IntervalZ"]);
             Tesslation = 1;
         }
     }

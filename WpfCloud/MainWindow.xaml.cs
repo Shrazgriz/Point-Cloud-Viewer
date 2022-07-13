@@ -11,6 +11,7 @@ using MVUnity.PointCloud;
 using MVUnity.Geometry3D;
 using System.Linq;
 using System.Configuration;
+using System.Collections.ObjectModel;
 
 namespace WpfCloud
 {
@@ -23,11 +24,11 @@ namespace WpfCloud
         private RenderWindow3d renderView;
         private Parameters parameters;
         private Cloud3D cloud;
+        private PointCloudNode CloudNode;
         bool m_PickPoint = true;
-        double Ransac_tolerance = 5;
-        double Filter_tolerance = 0.6;
+
         Color[] colors = new Color[6] { Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Purple, Color.Aqua };
-        //private GeneralParas paras;
+        private ObservableCollection<SceneNode> UserSelection;
         public MainWindow()
         {
             InitializeComponent();
@@ -36,6 +37,8 @@ namespace WpfCloud
             renderView.MouseClick += new MouseEventHandler(OnRenderWindow_MouseClick);
             parameters = new Parameters();
             GlobalInstance.EventListener.OnSelectElementEvent += OnSelectElement;
+            UserSelection = new ObservableCollection<SceneNode>();
+            LV_Selection.ItemsSource = UserSelection;
         }
 
         private void WriteLine(string content)
@@ -143,22 +146,21 @@ namespace WpfCloud
                     }
                     #endregion
                 }
-                PointCloudNode pcn = new PointCloudNode();
-                pcn.SetPickable(false);
-                //pcn.ComputeBBox();
+                CloudNode = new PointCloudNode();
+                CloudNode.SetPickable(false);
                 PointStyle ps = new PointStyle();
                 ps.SetMarker("rect");// circle, rect
                 ps.SetPointSize(4);
-                pcn.SetPointStyle(ps);
-                pcn.SetPoints(pointBuffer.ToArray());
-                pcn.SetColors(colorBuffer.ToArray());
+                CloudNode.SetPointStyle(ps);
+                CloudNode.SetPoints(pointBuffer.ToArray());
+                CloudNode.SetColors(colorBuffer.ToArray());
                 #region
-                GroupSceneNode bbox = DrawBoundBox(V3toVect(filereader.Min), V3toVect(filereader.Max), 500, 500, 500, 12);
+                GroupSceneNode bbox = DrawBoundBox(V3toVect(filereader.Min), V3toVect(filereader.Max), parameters, 12);
                 renderView.SceneManager.AddNode(bbox);
                 #endregion
                 V3 target = 0.5 * (filereader.Min + filereader.Max);
                 V3 came = target + V3.Identity * 200;
-                renderView.SceneManager.AddNode(pcn);
+                renderView.SceneManager.AddNode(CloudNode);
                 renderView.View3d.SetOrbitCenter(FromV3(target));
                 renderView.Renderer.LookAt(FromV3(target), FromV3(came), Vector3.UNIT_Z);                
                 //renderView.ShowWorkingGrid(false);
@@ -171,8 +173,11 @@ namespace WpfCloud
         {
             return new Vector3(value.X, value.Y, value.Z);
         }
-        private GroupSceneNode DrawBoundBox(Vector3 MinPt, Vector3 MaxPt, int IntervalX, int IntervalY, int IntervalZ, int FontSize)
+        private GroupSceneNode DrawBoundBox(Vector3 MinPt, Vector3 MaxPt, Parameters parameters, int FontSize)
         {
+            int IntervalX = parameters.IntervalX;
+            int IntervalY = parameters.IntervalY;
+            int IntervalZ = parameters.IntervalZ;
             GroupSceneNode plotModel = new GroupSceneNode();
             double minX = Math.Ceiling(MinPt.X / IntervalX) * IntervalX;
             double minY = Math.Ceiling(MinPt.Y / IntervalY) * IntervalY;
@@ -330,6 +335,11 @@ namespace WpfCloud
             {
                 SceneNode pNode = pickHelper.GetSceneNode();
                 TopoShape pGeo = pickHelper.GetGeometry();
+                UserSelection.Add(pNode);
+            }
+            else
+            {
+                UserSelection.Clear();
             }
         }
 
@@ -590,6 +600,26 @@ namespace WpfCloud
             cfa.AppSettings.Settings["BoundarySearchDistance"].Value = parameters.BoundarySearchWidth.ToString();
             //cfa.AppSettings.Settings["SimplifyAreaRation"].Value = parameters.SimplifyAreaRation.ToString();
             cfa.Save();
+        }
+
+        private void BN_PointsOn_Click(object sender, RoutedEventArgs e)
+        {
+            CloudNode.SetVisible(true);
+        }
+
+        private void BN_PointOff_Click(object sender, RoutedEventArgs e)
+        {
+            CloudNode.SetVisible(false);
+        }
+
+        private void BN_Sew_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BN_Trim_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

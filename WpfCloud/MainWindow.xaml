@@ -34,6 +34,18 @@
                 <Button x:Name="BN_AnaPlane" Margin="4" ToolTip="平面分析" Click="BN_AnalyzePlane_Click"  Height="Auto" >
                     <materialDesign:PackIcon Kind="MapSearchOutline" Width="28" Height="28"/>
                 </Button>
+                <Button x:Name="BN_Sew" Margin="4" ToolTip="缝合平面" Click="BN_Sew_Click" Height="Auto" >
+                    <materialDesign:PackIcon Kind="FormatHorizontalAlignCentre" Width="28" Height=" 28"/>
+                </Button>
+                <Button x:Name="BN_Trim" Margin="4" ToolTip="裁剪平面" Click="BN_Trim_Click" Height="Auto" >
+                    <materialDesign:PackIcon Kind="ScissorsCutting" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_PointsOn" Margin="4" ToolTip="显示点云" Click="BN_PointsOn_Click"  Height="Auto" >
+                    <materialDesign:PackIcon Kind="Blur" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_PointOff" Margin="4" ToolTip="隐藏点云" Click="BN_PointOff_Click" Height="Auto" >
+                    <materialDesign:PackIcon Kind="BlurOff" Width=" 28" Height=" 28" />
+                </Button>
                 <Button x:Name="menuExport" Content="模型输出" Margin=" 4" 
                             Click="MenuExport_Click">
                     
@@ -43,12 +55,16 @@
         <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <ScrollViewer>
                 <StackPanel x:Name="ToolBox1" Grid.Row="1" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Orientation="Horizontal">
-                    <Button x:Name="Tool_ResetView" Content="重置视角" HorizontalAlignment="Left" Margin="1,1,3,0"  VerticalAlignment="Top" Click="Button_Click">
-                        <Button.Background>
-                            <ImageBrush/>
-                        </Button.Background>
-                    </Button>
-                    <Button x:Name="Tool_Clear" Content="清除数据" HorizontalAlignment="Left" Margin="3,1,3,0" VerticalAlignment="Top"/>
+                    <ListView x:Name="LV_Selection">
+                        <ListView.ItemTemplate>
+                            <DataTemplate DataType="EntitySceneNode">
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <Label Content="{Binding Path=GetId}" Margin="2 0"/>
+                                    <Label Content="{Binding Path=GetName}" Margin=" 2 0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </StackPanel>
             </ScrollViewer>
         </materialDesign:Card>
