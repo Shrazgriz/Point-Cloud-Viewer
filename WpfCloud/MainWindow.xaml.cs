@@ -20,6 +20,9 @@ namespace WpfCloud
     /// </summary>
     public partial class MainWindow : Window
     {
+        const int BoundBoxID = 2;
+        const int PointCloudID = 1;
+        const int EntityID = 100;
         private const string OpenModelFilter = "3D model files (*.3ds;*.obj;*.lwo;*.stl;*.ply;)|*.3ds;*.obj;*.objz;*.lwo;*.stl;*.ply;";
         private RenderWindow3d renderView;
         private Parameters parameters;
@@ -54,7 +57,6 @@ namespace WpfCloud
         private void WindowsFormsHost_Loaded(object sender, RoutedEventArgs e)
         {
             renderView.SetBounds(0, 0, canvas.Width, canvas.Height);
-
             canvas.Controls.Add(renderView);
             renderView.SetBackgroundColor(ColorValue.WHITE, ColorValue.WHITE, ColorValue.WHITE);
         }
@@ -147,6 +149,7 @@ namespace WpfCloud
                     #endregion
                 }
                 CloudNode = new PointCloudNode();
+                CloudNode.SetId(new ElementId(PointCloudID));
                 CloudNode.SetPickable(false);
                 PointStyle ps = new PointStyle();
                 ps.SetMarker("rect");// circle, rect
@@ -179,6 +182,7 @@ namespace WpfCloud
             int IntervalY = parameters.IntervalY;
             int IntervalZ = parameters.IntervalZ;
             GroupSceneNode plotModel = new GroupSceneNode();
+            plotModel.SetId(new ElementId(BoundBoxID));
             double minX = Math.Ceiling(MinPt.X / IntervalX) * IntervalX;
             double minY = Math.Ceiling(MinPt.Y / IntervalY) * IntervalY;
             double minZ = Math.Ceiling(MinPt.Z / IntervalZ) * IntervalZ;
@@ -187,6 +191,7 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText(x.ToString("F0"));
                 label.SetPickable(false);
+                label.SetTextColor(ColorValue.BLACK);
                 label.SetPosition(new Vector3(x , MinPt.Y  - (FontSize * 2.5), MinPt.Z ));
                 //TextCreator.CreateTextLabelModel3D(x.ToString("F0"), Brushes.Black, true, FontSize,
                 //                                                           new Point3D(x * Scale.X, Floor.Y * Scale.Y - (FontSize * 2.5), Floor.Z * Scale.Z),
@@ -198,6 +203,7 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText("X(mm)");
                 label.SetPickable(false);
+                label.SetTextColor(ColorValue.BLACK);
                 label.SetPosition(new Vector3((MinPt.X + MaxPt.X) *  0.5, MinPt.Y - (FontSize * 6), MinPt.Z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("X (mm)", Brushes.Black, true, FontSize,
                 //                                                           new Point3D((Floor.X + Ceiling.X) * 0.5 * Scale.X, Floor.Y * Scale.Y - (FontSize * 6), Floor.Z * Scale.Z),
@@ -210,6 +216,7 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText(y.ToString("F0"));
                 label.SetPickable(false);
+                label.SetTextColor(ColorValue.BLACK);
                 label.SetPosition(new Vector3(MinPt.X  - FontSize * 3, y , MinPt.Z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D(y.ToString("F0"), Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), y * Scale.Y, Floor.Z * Scale.Z),
@@ -220,6 +227,7 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText("Y(mm)");
                 label.SetPickable(false);
+                label.SetTextColor(ColorValue.BLACK);
                 label.SetPosition(new Vector3(MinPt.X  - FontSize * 6, (MinPt.Y + MaxPt.Y) * 0.5, MinPt.Z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Y (mm)", Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), (Floor.Y + Ceiling.Y) * 0.5 * Scale.Y, Floor.Z * Scale.Z),
@@ -231,6 +239,7 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText(z.ToString("F0"));
                 label.SetPickable(false);
+                label.SetTextColor(ColorValue.BLACK);
                 label.SetPosition(new Vector3(MinPt.X  - FontSize * 3, MaxPt.Y , z ));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D(z.ToString("F0"), Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 3), Ceiling.Y * Scale.Y, z * Scale.Z),
@@ -241,6 +250,7 @@ namespace WpfCloud
                 TextNode label = new TextNode();
                 label.SetText("Z(mm)");
                 label.SetPickable(false);
+                label.SetTextColor(ColorValue.BLACK);
                 label.SetPosition(new Vector3(MinPt.X  - FontSize * 6, MinPt.Y , (MinPt.Z + MaxPt.Z)  * 0.5));
                 //GeometryModel3D label = TextCreator.CreateTextLabelModel3D("Z (mm)", Brushes.Black, true, FontSize,
                 //                                                           new Point3D(Floor.X * Scale.X - (FontSize * 10), Ceiling.Y * Scale.Y, (Floor.Z + Ceiling.Z) * 0.5 * Scale.Z),
@@ -562,7 +572,7 @@ namespace WpfCloud
                 }
                 #endregion
                 #region 平面可视化
-                int id = 0;
+                int id = EntityID;
                 foreach (Polygon3D rect in rects)
                 {
                     TopoShape face = PolygonToFace(rect);
