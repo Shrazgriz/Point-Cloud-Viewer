@@ -84,6 +84,15 @@ namespace WpfCloud
                     }
                 }
             }
+            SelectedEntityQuery selected = new SelectedEntityQuery();
+            renderView.QuerySelection(selected);
+            var IDArray = selected.GetIds();
+            UserSelection.Clear();
+            foreach (int ID in IDArray)
+            {
+                NodeInfo info = new NodeInfo(renderView.SceneManager.FindNode(new ElementId(ID)));
+                UserSelection.Add(info);
+            }
         }
 
         private void MenuReadCloud_Click(object sender, RoutedEventArgs e)
@@ -352,28 +361,28 @@ namespace WpfCloud
 
         private void OnRenderWindow_MouseClick(object sender, MouseEventArgs e)
         {
-            if (mousPick)
-            {
-                PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
-                if (pickHelper != null)
-                {
-                    SceneNode pNode = pickHelper.GetSceneNode();
-                    TopoShape pGeo = pickHelper.GetGeometry();
-                    NodeInfo info = new NodeInfo(pNode)
-                    {
-                        Name = pGeo.ToString()
-                    };
-                    UserSelection.Add(info);
-                }
-            }
-            else
-            {
-                PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
-                if (pickHelper == null)
-                {
-                    UserSelection.Clear();
-                }
-            }
+            //if (mousPick)
+            //{
+            //    PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
+            //    if (pickHelper != null)
+            //    {
+            //        SceneNode pNode = pickHelper.GetSceneNode();
+            //        TopoShape pGeo = pickHelper.GetGeometry();
+            //        NodeInfo info = new NodeInfo(pNode)
+            //        {
+            //            Name = pGeo.ToString()
+            //        };
+            //        UserSelection.Add(info);
+            //    }
+            //}
+            //else
+            //{
+            //    PickHelper pickHelper = renderView.PickShape(e.X, e.Y);
+            //    if (pickHelper == null)
+            //    {
+            //        UserSelection.Clear();
+            //    }
+            //}
         }
 
         private void MenuExport_Click(object sender, RoutedEventArgs e)
@@ -603,7 +612,10 @@ namespace WpfCloud
             TopoShape face = GlobalInstance.BrepTools.MakeFace(plygon);
             return face;
         }
-
+        private Polygon3D FaceToPolygon(TopoShape PolyFace)
+        {
+            
+        }
         private void MainForm_Closed(object sender, EventArgs e)
         {
             Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
@@ -642,12 +654,18 @@ namespace WpfCloud
         }
 
         private void BN_Sew_Click(object sender, RoutedEventArgs e)
-        {            
-            if (UserSelection.Count > 1)
+        {
+            SelectedEntityQuery query = new SelectedEntityQuery();
+            renderView.QuerySelection(query);
+            int[] selection = query.GetIds();
+            if (selection.Length > 1)
             {
-                //SceneNode ele0 = renderView.SceneManager.GetSelectedNode(new ElementId(UserSelection[0].ID));
-                u3d.Polygon3D q1 = (FittedPoly[idlist[0]] as Plate).Shape;
-                u3d.Polygon3D q2 = (FittedPoly[idlist[1]] as Plate).Shape;
+                EntitySceneNode ele0 = renderView.SceneManager.FindNode(new ElementId(selection[0])) as EntitySceneNode;
+                EntitySceneNode ele1 = renderView.SceneManager.FindNode(new ElementId(selection[1])) as EntitySceneNode;
+                TopoShape poly0 = (ele0.GetEntity() as RenderableGeometry).GetGeometry();
+                TopoShape poly1 = (ele1.GetEntity() as RenderableGeometry).GetGeometry();
+                Polygon3D q1 = (FittedPoly[idlist[0]] as Plate).Shape;
+                Polygon3D q2 = (FittedPoly[idlist[1]] as Plate).Shape;
                 Plane p1 = Plane.CreatePlane(q1.GetAllVertice());
                 Plane p2 = Plane.CreatePlane(q2.GetAllVertice());
                 if (p1.AlgDistance(q2.Center) < 0) p1.Revert();

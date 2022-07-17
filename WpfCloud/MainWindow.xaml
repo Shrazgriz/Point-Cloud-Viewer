@@ -9,7 +9,8 @@
         xmlns:wf ="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         Title="点云数据智能处理" Height="720" Width="1280" FontSize="16" FontWeight="Bold" 
-        Closed="MainForm_Closed" Keyboard.KeyDown="MainForm_KeyDown" Keyboard.KeyUp="MainForm_KeyUp">
+        Closed="MainForm_Closed">
+    <!--Keyboard.KeyDown="MainForm_KeyDown" Keyboard.KeyUp="MainForm_KeyUp">-->
     <Grid x:Name="MajorGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*" MaxHeight="60"/>
