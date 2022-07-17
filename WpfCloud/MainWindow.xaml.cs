@@ -26,7 +26,7 @@ namespace WpfCloud
         private const string OpenModelFilter = "3D model files (*.3ds;*.obj;*.lwo;*.stl;*.ply;)|*.3ds;*.obj;*.objz;*.lwo;*.stl;*.ply;";
         private RenderWindow3d renderView;
         private Parameters parameters;
-        private Cloud3D cloud;
+        //private Cloud3D cloud;
         private PointCloudNode CloudNode;
         bool mousPick = false;
 
@@ -359,8 +359,10 @@ namespace WpfCloud
                 {
                     SceneNode pNode = pickHelper.GetSceneNode();
                     TopoShape pGeo = pickHelper.GetGeometry();
-                    NodeInfo info = new NodeInfo(pNode);
-                    info.Name = pGeo.ToString();
+                    NodeInfo info = new NodeInfo(pNode)
+                    {
+                        Name = pGeo.ToString()
+                    };
                     UserSelection.Add(info);
                 }
             }
@@ -382,18 +384,18 @@ namespace WpfCloud
             };
             if (saveFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string filepath = saveFile.FileName;
-                FileStream save = new FileStream(filepath, FileMode.Create);
-                StreamWriter writer = new StreamWriter(save);
+                //string filepath = saveFile.FileName;
+                //FileStream save = new FileStream(filepath, FileMode.Create);
+                //StreamWriter writer = new StreamWriter(save);
 
-                foreach (var point in cloud.Points)
-                {
-                    if (point.Value.Z == -1) continue;
-                    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {5}", point.Value.X, point.Value.Y, point.Value.Z, cloud.Colors[point.Key].R, cloud.Colors[point.Key].G, cloud.Colors[point.Key].B));
-                }
+                //foreach (var point in cloud.Points)
+                //{
+                //    if (point.Value.Z == -1) continue;
+                //    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {5}", point.Value.X, point.Value.Y, point.Value.Z, cloud.Colors[point.Key].R, cloud.Colors[point.Key].G, cloud.Colors[point.Key].B));
+                //}
 
-                writer.Close();
-                save.Close();
+                //writer.Close();
+                //save.Close();
             }
         }
 
@@ -575,12 +577,14 @@ namespace WpfCloud
                 int id = EntityID;
                 foreach (Polygon3D rect in rects)
                 {
+                    id++;
                     TopoShape face = PolygonToFace(rect);
                     RenderableGeometry entity = new RenderableGeometry();
                     entity.SetGeometry(face);
-                    entity.SetId(++id);
+                    entity.SetId(id);
                     EntitySceneNode node = new EntitySceneNode();
                     node.SetEntity(entity);
+                    node.SetId(new ElementId(id));
                     renderView.SceneManager.AddNode(node);
                     //renderView.ShowGeometry(face, ++id);
                 }                                
@@ -592,7 +596,7 @@ namespace WpfCloud
             }
         }
 
-        private TopoShape PolygonToFace( Polygon3D Poly)
+        private TopoShape PolygonToFace(Polygon3D Poly)
         {
             List<Vector3> points = Poly.GetAllVertice().Select(v => new Vector3(v.X, v.Y, v.Z)).ToList();
             TopoShape plygon = GlobalInstance.BrepTools.MakePolygon(points);
@@ -638,8 +642,56 @@ namespace WpfCloud
         }
 
         private void BN_Sew_Click(object sender, RoutedEventArgs e)
-        {
-
+        {            
+            if (UserSelection.Count > 1)
+            {
+                //SceneNode ele0 = renderView.SceneManager.GetSelectedNode(new ElementId(UserSelection[0].ID));
+                u3d.Polygon3D q1 = (FittedPoly[idlist[0]] as Plate).Shape;
+                u3d.Polygon3D q2 = (FittedPoly[idlist[1]] as Plate).Shape;
+                Plane p1 = Plane.CreatePlane(q1.GetAllVertice());
+                Plane p2 = Plane.CreatePlane(q2.GetAllVertice());
+                if (p1.AlgDistance(q2.Center) < 0) p1.Revert();
+                if (p2.AlgDistance(q1.Center) < 0) p2.Revert();
+                double dis1 = p1.AbsDistance(q2.Center);
+                double dis2 = p2.AbsDistance(q1.Center);
+                GeneralParameter general = new GeneralParameter()
+                {
+                    AlphaName = FittedPoly[idlist[0]].Name,
+                    BetaName = FittedPoly[idlist[1]].Name,
+                    TipAlpha = dis1.ToString("F2"),
+                    TipBeta = dis2.ToString("F2"),
+                    ParaAlpha = parameters.MaxGap.ToString("F2"),
+                    ParaBeta = parameters.MaxGap.ToString("F2"),
+                    Name = "缝合操作"
+                };
+                WGeoOperate operate = new WGeoOperate(general);
+                if (operate.ShowDialog() == true)
+                {
+                    TB_output.Text = "缝合对象:\n";
+                    var plate1 = FittedPoly[idlist[0]] as Plate;
+                    var plate2 = FittedPoly[idlist[1]] as Plate;
+                    WriteLine(plate1.Shape.ToString());
+                    WriteLine(plate2.Shape.ToString());
+                    (FittedPoly[idlist[0]] as Plate).SewTo(p2, double.Parse(operate.Parameter.ParaAlpha));
+                    (FittedPoly[idlist[1]] as Plate).SewTo(p1, double.Parse(operate.Parameter.ParaAlpha));
+                    WriteLine("缝合后:");
+                    WriteLine(plate1.Shape.ToString());
+                    WriteLine(plate2.Shape.ToString());
+                    switch (Filter)
+                    {
+                        case FilterMode.Polygons:
+                            ShowPolys();
+                            break;
+                        case FilterMode.Boundarys:
+                            ShowEntities(Boundaries);
+                            break;
+                        case FilterMode.Stiffs:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
 
         private void BN_Trim_Click(object sender, RoutedEventArgs e)
