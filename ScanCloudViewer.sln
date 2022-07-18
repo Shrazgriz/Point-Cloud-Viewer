@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfCloud", "WpfCloud\WpfClo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudHelix", "CloudHelix\CloudHelix.csproj", "{56FBCF4F-9EEE-439D-905F-745E1FB66DFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RapidWPF", "RapidWPF\RapidWPF.csproj", "{3186ECCE-3DB8-441E-9EE6-4BAC5623A6E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{56FBCF4F-9EEE-439D-905F-745E1FB66DFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56FBCF4F-9EEE-439D-905F-745E1FB66DFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56FBCF4F-9EEE-439D-905F-745E1FB66DFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3186ECCE-3DB8-441E-9EE6-4BAC5623A6E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3186ECCE-3DB8-441E-9EE6-4BAC5623A6E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3186ECCE-3DB8-441E-9EE6-4BAC5623A6E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3186ECCE-3DB8-441E-9EE6-4BAC5623A6E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
