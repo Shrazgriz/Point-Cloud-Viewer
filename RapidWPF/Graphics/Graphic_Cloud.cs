@@ -11,12 +11,13 @@ namespace RapidWPF.Graphics
     {
         static Float32Buffer mPositions;
         static Float32Buffer mColors;
-        static MVUnity.Exchange.CloudReader filereader;
-        static Parameters parameters;
-        public Graphic_Cloud(MVUnity.Exchange.CloudReader cloud)
+        MVUnity.Exchange.CloudReader filereader;
+        System.Windows.Media.Color pColor;
+        //static Parameters parameters;
+        public Graphic_Cloud(MVUnity.Exchange.CloudReader cloud, System.Windows.Media.Color PointColor)
         {
             filereader = cloud;
-            parameters = new Parameters();
+            pColor = PointColor;
         }
         bool ReadData()
         {
@@ -28,7 +29,7 @@ namespace RapidWPF.Graphics
             if (filereader.Format.Contains('r') & filereader.Format.Contains('c'))
             {
                 #region 有序点云         
-                List<List<ScanRow>> cloud = filereader.ReadMultipleCloudOpton(parameters.RowSkip, parameters.VertexSkip);
+                List<List<ScanRow>> cloud = filereader.ReadMultipleCloudOpton();
                 //int colorID = 0;
                 foreach (List<ScanRow> rows in cloud)
                 {
@@ -40,14 +41,12 @@ namespace RapidWPF.Graphics
                             mPositions.Append((float)vertex.X);
                             mPositions.Append((float)vertex.Y);
                             mPositions.Append((float)vertex.Z);
-                            mColors.Append(parameters.PointColor.R * f / 65535f);
-                            mColors.Append(parameters.PointColor.G * f / 65535f);
-                            mColors.Append(parameters.PointColor.B * f / 65535f);
+                            mColors.Append(pColor.R * f / 65535f);
+                            mColors.Append(pColor.G * f / 65535f);
+                            mColors.Append(pColor.B * f / 65535f);
                             f--;
                             if (f == 127) f = 256;
                         }
-                        //colorID++;
-                        //if (colorID >= colors.Length) colorID -= colors.Length;
                     }
                 }
                 #endregion
@@ -55,16 +54,15 @@ namespace RapidWPF.Graphics
             else
             {
                 #region 无序点云
-                Point3D[] pts = filereader.ReadCloud(parameters.VertexSkip);
-                System.Windows.Media.Color color = parameters.PointBrush.Color;
+                Point3D[] pts = filereader.ReadCloud(filereader.VertSkip);
                 foreach (Point3D pt in pts)
                 {
                     mPositions.Append((float)pt.X);
                     mPositions.Append((float)pt.Y);
                     mPositions.Append((float)pt.Z);
-                    mColors.Append(color.R);
-                    mColors.Append(color.G);
-                    mColors.Append(color.B);
+                    mColors.Append(pColor.R);
+                    mColors.Append(pColor.G);
+                    mColors.Append(pColor.B);
                 }
                 #endregion
             }

@@ -51,9 +51,11 @@ namespace RapidWPF
                 {
                     Scale = readcloud.Parameters.Cloudscale,
                     FileName = open.FileName,
-                    Format = readcloud.Parameters.Cloudformat
+                    Format = readcloud.Parameters.Cloudformat,
+                    RowSkip= parameters.RowSkip,
+                    VertSkip = parameters.VertexSkip
                 };
-                Graphic_Cloud cloud = new Graphic_Cloud(filereader);
+                Graphic_Cloud cloud = new Graphic_Cloud(filereader, readcloud.Parameters.PointColor);
                 cloud.Run(mRenderCtrl);
 
             }
