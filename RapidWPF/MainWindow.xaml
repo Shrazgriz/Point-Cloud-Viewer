@@ -5,13 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RapidWPF"
         xmlns:anycad="clr-namespace:AnyCAD.WPF;assembly=AnyCAD.WPF.NET4"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition MinWidth="100" Width="0.3*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <anycad:RenderControl Grid.Column="1" x:Name="mRenderCtrl"/>
+        <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
+            <WrapPanel x:Name="MainPanel" VerticalAlignment="Center">
+                <Button x:Name="BN_ReadCloud"  Margin="4 " Height="Auto" 
+                            Click="BN_ReadCloud_Click">
+                    <materialDesign:PackIcon Kind="FolderOpenOutline" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_ReadModel" Margin="4" ToolTip="读取模型" Height="Auto" Click="BN_ReadModel_Click">
+                    <materialDesign:PackIcon Kind="Import" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_AnaPlane" Margin="4" ToolTip="平面分析" Click="BN_AnaPlane_Click"  Height="Auto" >
+                    <materialDesign:PackIcon Kind="MapSearchOutline" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_Sew" Margin="4" ToolTip="缝合平面" Click="BN_Sew_Click" Height="Auto" >
+                    <materialDesign:PackIcon Kind="FormatHorizontalAlignCentre" Width="28" Height=" 28"/>
+                </Button>
+                <Button x:Name="BN_Trim" Margin="4" ToolTip="裁剪平面" Click="BN_Trim_Click" Height="Auto" >
+                    <materialDesign:PackIcon Kind="ScissorsCutting" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_PointsOn" Margin="4" ToolTip="显示点云" Click="BN_PointsOn_Click"  Height="Auto" >
+                    <materialDesign:PackIcon Kind="Blur" Width="28" Height="28"/>
+                </Button>
+                <Button x:Name="BN_PointOff" Margin="4" ToolTip="隐藏点云" Click="BN_PointOff_Click" Height="Auto" >
+                    <materialDesign:PackIcon Kind="BlurOff" Width=" 28" Height=" 28" />
+                </Button>
+                <Button x:Name="BN_Export" Margin=" 4" Click="BN_Export_Click">
+                </Button>
+            </WrapPanel>
+        </materialDesign:Card>
+        <anycad:RenderControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="mRenderCtrl" Background="Aquamarine" 
+                               ViewerReady="mRenderCtrl_ViewerReady"/>
     </Grid>
 </Window>
