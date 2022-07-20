@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Data;
 using MVUnity;
 using AnyCAD.Foundation;
+using MVUnity.Geometry3D;
 
 namespace RapidWPF
 {
@@ -110,6 +111,25 @@ namespace RapidWPF
         public static Vector3 ToVector3(V3 value)
         {
             return new Vector3((float)value.X, (float)value.Y, (float)value.Z);
+        }
+
+        public static GPnt ToGPnt(V3 value)
+        {
+            return new GPnt((float)value.X, (float)value.Y, (float)value.Z);
+        }
+    }
+
+    public static class ConvertPoly3
+    {
+        public static TopoShape ToShape(Polygon3D Poly)
+        {
+            GPntList points = new GPntList();
+            foreach (GPnt item in Poly.GetAllVertice().Select(v => ConvertV3.ToGPnt(v)))
+            {
+                points.Add(item);
+            }
+            TopoShape plygon = SketchBuilder.MakePolygonFace(points)
+            return plygon;
         }
     }
 }

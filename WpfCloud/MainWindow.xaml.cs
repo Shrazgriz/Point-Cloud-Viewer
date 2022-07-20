@@ -595,8 +595,7 @@ namespace WpfCloud
                     node.SetEntity(entity);
                     node.SetId(new ElementId(id));
                     renderView.SceneManager.AddNode(node);
-                    //renderView.ShowGeometry(face, ++id);
-                }                                
+                }
                 #endregion
 
                 WriteLine(string.Format("Region count: {0}", regions.Count));
@@ -614,7 +613,9 @@ namespace WpfCloud
         }
         private Polygon3D FaceToPolygon(TopoShape PolyFace)
         {
-            
+            TopoExplor explor = new TopoExplor();
+            TopoShapeGroup v = explor.ExplorVertices(PolyFace);
+
         }
         private void MainForm_Closed(object sender, EventArgs e)
         {
@@ -664,51 +665,51 @@ namespace WpfCloud
                 EntitySceneNode ele1 = renderView.SceneManager.FindNode(new ElementId(selection[1])) as EntitySceneNode;
                 TopoShape poly0 = (ele0.GetEntity() as RenderableGeometry).GetGeometry();
                 TopoShape poly1 = (ele1.GetEntity() as RenderableGeometry).GetGeometry();
-                Polygon3D q1 = (FittedPoly[idlist[0]] as Plate).Shape;
-                Polygon3D q2 = (FittedPoly[idlist[1]] as Plate).Shape;
-                Plane p1 = Plane.CreatePlane(q1.GetAllVertice());
-                Plane p2 = Plane.CreatePlane(q2.GetAllVertice());
-                if (p1.AlgDistance(q2.Center) < 0) p1.Revert();
-                if (p2.AlgDistance(q1.Center) < 0) p2.Revert();
-                double dis1 = p1.AbsDistance(q2.Center);
-                double dis2 = p2.AbsDistance(q1.Center);
-                GeneralParameter general = new GeneralParameter()
-                {
-                    AlphaName = FittedPoly[idlist[0]].Name,
-                    BetaName = FittedPoly[idlist[1]].Name,
-                    TipAlpha = dis1.ToString("F2"),
-                    TipBeta = dis2.ToString("F2"),
-                    ParaAlpha = parameters.MaxGap.ToString("F2"),
-                    ParaBeta = parameters.MaxGap.ToString("F2"),
-                    Name = "缝合操作"
-                };
-                WGeoOperate operate = new WGeoOperate(general);
-                if (operate.ShowDialog() == true)
-                {
-                    TB_output.Text = "缝合对象:\n";
-                    var plate1 = FittedPoly[idlist[0]] as Plate;
-                    var plate2 = FittedPoly[idlist[1]] as Plate;
-                    WriteLine(plate1.Shape.ToString());
-                    WriteLine(plate2.Shape.ToString());
-                    (FittedPoly[idlist[0]] as Plate).SewTo(p2, double.Parse(operate.Parameter.ParaAlpha));
-                    (FittedPoly[idlist[1]] as Plate).SewTo(p1, double.Parse(operate.Parameter.ParaAlpha));
-                    WriteLine("缝合后:");
-                    WriteLine(plate1.Shape.ToString());
-                    WriteLine(plate2.Shape.ToString());
-                    switch (Filter)
-                    {
-                        case FilterMode.Polygons:
-                            ShowPolys();
-                            break;
-                        case FilterMode.Boundarys:
-                            ShowEntities(Boundaries);
-                            break;
-                        case FilterMode.Stiffs:
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                //Polygon3D q1 = (FittedPoly[idlist[0]] as Plate).Shape;
+                //Polygon3D q2 = (FittedPoly[idlist[1]] as Plate).Shape;
+                //Plane p1 = Plane.CreatePlane(q1.GetAllVertice());
+                //Plane p2 = Plane.CreatePlane(q2.GetAllVertice());
+                //if (p1.AlgDistance(q2.Center) < 0) p1.Revert();
+                //if (p2.AlgDistance(q1.Center) < 0) p2.Revert();
+                //double dis1 = p1.AbsDistance(q2.Center);
+                //double dis2 = p2.AbsDistance(q1.Center);
+                //GeneralParameter general = new GeneralParameter()
+                //{
+                //    AlphaName = FittedPoly[idlist[0]].Name,
+                //    BetaName = FittedPoly[idlist[1]].Name,
+                //    TipAlpha = dis1.ToString("F2"),
+                //    TipBeta = dis2.ToString("F2"),
+                //    ParaAlpha = parameters.MaxGap.ToString("F2"),
+                //    ParaBeta = parameters.MaxGap.ToString("F2"),
+                //    Name = "缝合操作"
+                //};
+                //WGeoOperate operate = new WGeoOperate(general);
+                //if (operate.ShowDialog() == true)
+                //{
+                //    TB_output.Text = "缝合对象:\n";
+                //    var plate1 = FittedPoly[idlist[0]] as Plate;
+                //    var plate2 = FittedPoly[idlist[1]] as Plate;
+                //    WriteLine(plate1.Shape.ToString());
+                //    WriteLine(plate2.Shape.ToString());
+                //    (FittedPoly[idlist[0]] as Plate).SewTo(p2, double.Parse(operate.Parameter.ParaAlpha));
+                //    (FittedPoly[idlist[1]] as Plate).SewTo(p1, double.Parse(operate.Parameter.ParaAlpha));
+                //    WriteLine("缝合后:");
+                //    WriteLine(plate1.Shape.ToString());
+                //    WriteLine(plate2.Shape.ToString());
+                //    switch (Filter)
+                //    {
+                //        case FilterMode.Polygons:
+                //            ShowPolys();
+                //            break;
+                //        case FilterMode.Boundarys:
+                //            ShowEntities(Boundaries);
+                //            break;
+                //        case FilterMode.Stiffs:
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //}
             }
         }
 

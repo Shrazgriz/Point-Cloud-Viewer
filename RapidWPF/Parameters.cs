@@ -29,6 +29,7 @@ namespace RapidWPF
         private int intervalX;
         private int intervalY;
         private int intervalZ;
+        private float fontSize;
         public int StiffResX { get => stiffResX; set => stiffResX = value; }
         public int StiffResY { get => stiffResY; set => stiffResY = value; }
         public double CellNormTol { get => cellNormTol; set => cellNormTol = value; }
@@ -74,6 +75,7 @@ namespace RapidWPF
         public int IntervalZ { get => intervalZ; set => intervalZ = value; }
         public int IntervalY { get => intervalY; set => intervalY = value; }
         public int IntervalX { get => intervalX; set => intervalX = value; }
+        public float FontSize { get => fontSize; set => fontSize = value; }
 
         public Parameters()
         {

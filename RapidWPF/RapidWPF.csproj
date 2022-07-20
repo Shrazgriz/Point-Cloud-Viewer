@@ -83,7 +83,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters.cs" />
+    <Compile Include="DBScan.cs" />
     <Compile Include="Graphics\Graphic_Cloud.cs" />
+    <Compile Include="Graphics\Graphic_Polygons.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="WReadCloud.xaml.cs">
       <DependentUpon>WReadCloud.xaml</DependentUpon>

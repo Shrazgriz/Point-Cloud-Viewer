@@ -85,7 +85,7 @@ namespace RapidWPF.Graphics
             render.ShowSceneNode(node);
         }
 
-        public void DrawBoundingBox(RenderControl render, int FontSize)
+        public void DrawBoundingBox(RenderControl render, float FontSize)
         {
             if (filereader == null)
             {
@@ -96,7 +96,7 @@ namespace RapidWPF.Graphics
             render.ShowSceneNode(boxNode);
         }
 
-        private GroupSceneNode DrawBoundBox(MVUnity.Exchange.CloudReader cloud, int FontSize)
+        private GroupSceneNode DrawBoundBox(MVUnity.Exchange.CloudReader cloud, float FontSize)
         {
             GroupSceneNode plotModel = new GroupSceneNode();
             Vector3 Floor = ConvertV3.ToVector3(cloud.Min);

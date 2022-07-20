@@ -3,86 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using AnyCAD.Foundation;
+using AnyCAD.WPF;
 using MVUnity;
 using MVUnity.PointCloud;
 using MVUnity.Geometry3D;
-using AnyCAD.Foundation;
-using RapidWPF.Graphics;
 
-namespace RapidWPF
+namespace RapidWPF.Graphics
 {
-    /// <summary>
-    /// MainWindow.xaml 的交互逻辑
-    /// </summary>
-    public partial class MainWindow : Window
+    public class Graphic_Polygons
     {
-        private Parameters parameters;
-        public MainWindow()
-        {
-            InitializeComponent();
-            parameters = new Parameters();
-        }
+        const ulong PolyonID = 100;
+        private static List<Polygon3D> polygons;
+        private double mergeRation;
+        private MVUnity.Exchange.CloudReader filereader;
 
-        private void mRenderCtrl_ViewerReady()
+        public Graphic_Polygons(MVUnity.Exchange.CloudReader reader, Parameters parameter)
         {
-            AnyCAD.Forms.RenderControl render = mRenderCtrl.View3D;
-            render.SetBackgroundColor(0f, 0.5f, 0.5f, 0.25f);
-        }
-
-        private void BN_ReadCloud_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog open = new OpenFileDialog();
-            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            filereader = new MVUnity.Exchange.CloudReader
             {
-                parameters.CloudFilePath = open.FileName;
-                mRenderCtrl.ClearScene();
-                WReadCloud readcloud = new WReadCloud(parameters);
-                if (readcloud.ShowDialog() != true) return;
-                parameters = readcloud.Parameters;
-                MVUnity.Exchange.CloudReader filereader = new MVUnity.Exchange.CloudReader
-                {
-                    Scale = parameters.Cloudscale,
-                    FileName = open.FileName,
-                    Format = parameters.Cloudformat,
-                    RowSkip = parameters.RowSkip,
-                    VertSkip = parameters.VertexSkip
-                };
-                Graphic_Cloud cloud = new Graphic_Cloud(filereader, parameters);
-                cloud.Run(mRenderCtrl);
-                cloud.DrawBoundingBox(mRenderCtrl, parameters.FontSize);
-            }
-        }
-
-        private void BN_ReadModel_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void BN_AnaPlane_Click(object sender, RoutedEventArgs e)
-        {
-            if (parameters.CloudFilePath == null)
-            {
-                throw new Exception("需要先读取点云");
-            }
-
-            #region 区分异源点云
-            MVUnity.Exchange.CloudReader filereader = new MVUnity.Exchange.CloudReader
-            {
-                Scale = parameters.Cloudscale,
-                FileName = parameters.CloudFilePath,
-                Format = parameters.Cloudformat
+                Scale = reader.Scale,
+                FileName = reader.FileName,
+                Format = reader.Format,
+                RowSkip = reader.RowSkip,
+                VertSkip = reader.VertSkip
             };
-            List<List<ScanRow>> diffRows = filereader.ReadMultipleCloudOpton(parameters.RowSkip, parameters.VertexSkip);
+            mergeRation = parameter.MergeRation;
+        }
+
+        private bool ReadData()
+        {
+            if (filereader.FileName == null)
+            {
+                return false;
+            }
+            if (Graphic_Polygons.polygons == null)
+            {
+                Graphic_Polygons.polygons = new List<Polygon3D>();
+            }
+            else { Graphic_Polygons.polygons.Clear(); }
+            #region 区分异源点云
+            List<List<ScanRow>> diffRows = filereader.ReadMultipleCloudOpton(filereader.RowSkip, filereader.VertSkip);
 
             #endregion
             #region 编制扫描线
@@ -196,7 +157,10 @@ namespace RapidWPF
             #region 合并相同平面
             foreach (CompiledRegion r in regions)
             {
-                if (r.State == RegionState.Open) r.State = RegionState.Completed;
+                if (r.State == RegionState.Open)
+                {
+                    r.State = RegionState.Completed;
+                }
             }
             List<List<CompiledRegion>> groups = DBScan.ClusteringRegions(regions.FindAll(r => r.CellCount > CloudConstants.MinRegionCellCount).ToList());
 
@@ -219,7 +183,7 @@ namespace RapidWPF
 
                     double area1 = bound.GetArea();
                     double area2 = groups[i].Select(r => r.Boundary.GetArea()).Sum();
-                    if (area1 * parameters.MergeRation > area2)
+                    if (area1 * mergeRation > area2)
                     {
                         polygons.AddRange(groups[i].Select(r => r.Boundary));
                     }
@@ -230,52 +194,29 @@ namespace RapidWPF
                 }
             }
             #endregion
+            return true;
+        }
+
+        private void DrawPolys(RenderControl render)
+        {
             #region 平面可视化
-            int id = EntityID;
+            ulong id = PolyonID;
             foreach (Polygon3D rect in polygons)
             {
                 id++;
-                TopoShape face = PolygonToFace(rect);
-                RenderableGeometry entity = new RenderableGeometry();
-                entity.SetGeometry(face);
-                entity.SetId(id);
-                EntitySceneNode node = new EntitySceneNode();
-                node.SetEntity(entity);
-                node.SetId(new ElementId(id));
-                renderView.SceneManager.AddNode(node);
+                TopoShape face = ConvertPoly3.ToShape(rect);
+                MeshPhongMaterial material = MeshPhongMaterial.Create("phong.bspline");
+                BrepSceneNode entity = BrepSceneNode.Create(face, material, material);
+                entity.SetUserId(id);
+                render.ShowSceneNode(entity);
             }
             #endregion
-
-            WriteLine(string.Format("Region count: {0}", regions.Count));
-            WriteLine(string.Format("Filted count: {0}", regions.FindAll(r => r.CellCount > CloudConstants.MinRegionCellCount && r.EstimatedArea > CloudConstants.MinRegionArea).Count));
-            WriteLine(string.Format("Clusters count: {0}", groups.Count));
-
         }
-
-        private void BN_Sew_Click(object sender, RoutedEventArgs e)
+        public void Run(RenderControl render)
         {
-
+            if (!ReadData())
+                return;
+            DrawPolys(render);
         }
-
-        private void BN_Trim_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void BN_PointsOn_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void BN_PointOff_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void BN_Export_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
     }
 }
