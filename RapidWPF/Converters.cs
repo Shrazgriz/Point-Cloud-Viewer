@@ -104,4 +104,12 @@ namespace RapidWPF
             return new V3(vert.x, vert.y, vert.z);
         }
     }
+
+    public static class ConvertV3
+    {
+        public static Vector3 ToVector3(V3 value)
+        {
+            return new Vector3((float)value.X, (float)value.Y, (float)value.Z);
+        }
+    }
 }

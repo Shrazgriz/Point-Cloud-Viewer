@@ -25,8 +25,8 @@ namespace RapidWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        const int fontSize = 2;
         private Parameters parameters;
-        private PointCloud CloudNode;
         public MainWindow()
         {
             InitializeComponent();
@@ -46,18 +46,18 @@ namespace RapidWPF
                 mRenderCtrl.ClearScene();
                 WReadCloud readcloud = new WReadCloud(parameters);
                 if (readcloud.ShowDialog() != true) return;
-
+                parameters = readcloud.Parameters;
                 MVUnity.Exchange.CloudReader filereader = new MVUnity.Exchange.CloudReader
                 {
-                    Scale = readcloud.Parameters.Cloudscale,
+                    Scale = parameters.Cloudscale,
                     FileName = open.FileName,
-                    Format = readcloud.Parameters.Cloudformat,
+                    Format = parameters.Cloudformat,
                     RowSkip= parameters.RowSkip,
                     VertSkip = parameters.VertexSkip
                 };
-                Graphic_Cloud cloud = new Graphic_Cloud(filereader, readcloud.Parameters.PointColor);
+                Graphic_Cloud cloud = new Graphic_Cloud(filereader,parameters);
                 cloud.Run(mRenderCtrl);
-
+                cloud.DrawBoundingBox(mRenderCtrl, fontSize);
             }
         }
 

@@ -45,7 +45,7 @@
                 </Button>
             </WrapPanel>
         </materialDesign:Card>
-        <anycad:RenderControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="mRenderCtrl" Background="Aquamarine" 
+        <anycad:RenderControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="mRenderCtrl" 
                                ViewerReady="mRenderCtrl_ViewerReady"/>
     </Grid>
 </Window>
