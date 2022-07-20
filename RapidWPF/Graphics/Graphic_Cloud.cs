@@ -104,8 +104,10 @@ namespace RapidWPF.Graphics
             float minX = (float)Math.Ceiling(Floor.x / IntervalX) * IntervalX;
             float minY = (float)Math.Ceiling(Floor.y / IntervalY) * IntervalY;
             float minZ = (float)Math.Ceiling(Floor.z / IntervalZ) * IntervalZ;
-            MeshPhongMaterial material = MeshPhongMaterial.Create("phong.bspline");
-            material.SetUniform("diffuse", Uniform.Create(new Vector3(1, 0, 1)));
+            var material = MeshStandardMaterial.Create("my-material");
+            material.SetRoughness(0.75f);
+            material.SetMetalness(0.1f);
+            material.SetColor(Vector3.Zero);
             material.SetFaceSide(EnumFaceSide.DoubleSide);
 
             for (float x = minX; x <= Ceiling.x; x += IntervalX)
@@ -113,7 +115,7 @@ namespace RapidWPF.Graphics
                 BufferGeometry geometry = FontManager.Instance().CreateMesh(x.ToString("F0"));
                 TextSceneNode label = new TextSceneNode(geometry, material, FontSize, true);
                 label.SetWorldTransform(Matrix4.makeTranslation(x, Floor.y - (FontSize * 2.5f), Floor.z) * Matrix4.makeRotationAxis(Vector3.UNIT_Z, (float)(-0.5f * Math.PI)) *
-                    Matrix4.makeScale(FontSize * 0.1f, FontSize * 0.1f, FontSize * 0.1f));
+                    Matrix4.makeScale(FontSize * 0.01f, FontSize * 0.01f, FontSize * 0.01f));
                 label.SetPickable(false);
                 plotModel.AddNode(label);
             }
@@ -123,7 +125,7 @@ namespace RapidWPF.Graphics
                 TextSceneNode label = new TextSceneNode(geometry, material, FontSize, true);
                 label.SetPickable(false);
                 label.SetWorldTransform(Matrix4.makeTranslation((Floor.x + Ceiling.x) * 0.5f, Floor.y - FontSize * 6, Floor.z)
-                    * Matrix4.makeRotationAxis(Vector3.UNIT_Z, (float)(-0.5f * Math.PI)) * Matrix4.makeScale(FontSize * 0.1f, FontSize * 0.1f, FontSize * 0.1f));
+                    * Matrix4.makeRotationAxis(Vector3.UNIT_Z, (float)(-0.5f * Math.PI)) * Matrix4.makeScale(FontSize * 0.01f, FontSize * 0.01f, FontSize * 0.01f));
                 plotModel.AddNode(label);
             }
 
@@ -133,7 +135,7 @@ namespace RapidWPF.Graphics
                 TextSceneNode label = new TextSceneNode(geometry, material, FontSize, true);
                 label.SetPickable(false);
                 label.SetWorldTransform(Matrix4.makeTranslation(Floor.x + FontSize * 3, y, Floor.z)
-                    * Matrix4.makeScale(FontSize * 0.1f, FontSize * 0.1f, FontSize * 0.1f));
+                    *Matrix4.makeScale(FontSize * 0.01f, FontSize * 0.01f, FontSize * 0.01f));
                 plotModel.AddNode(label);
             }
             {
@@ -141,7 +143,7 @@ namespace RapidWPF.Graphics
                 TextSceneNode label = new TextSceneNode(geometry, material, FontSize, true);
                 label.SetPickable(false);
                 label.SetWorldTransform(Matrix4.makeTranslation(Floor.x + FontSize * 6, (Floor.y + Ceiling.y) * 0.5f, Floor.z)
-                    * Matrix4.makeScale(FontSize * 0.1f, FontSize * 0.1f, FontSize * 0.1f));
+                    *Matrix4.makeScale(FontSize * 0.01f, FontSize * 0.01f, FontSize * 0.01f));
                 plotModel.AddNode(label);
             }
 
@@ -151,7 +153,7 @@ namespace RapidWPF.Graphics
                 TextSceneNode label = new TextSceneNode(geometry, material, FontSize, true);
                 label.SetPickable(false);
                 label.SetWorldTransform(Matrix4.makeTranslation(Floor.x + FontSize * 3, Ceiling.y, z)
-                    * Matrix4.makeRotationAxis(Vector3.UNIT_X, (float)(0.5f * Math.PI)) * Matrix4.makeScale(FontSize * 0.1f, FontSize * 0.1f, FontSize * 0.1f));
+                    * Matrix4.makeRotationAxis(Vector3.UNIT_X, (float)(0.5f * Math.PI)) * Matrix4.makeScale(FontSize * 0.01f, FontSize * 0.01f, FontSize * 0.01f));
                 plotModel.AddNode(label);
             }
             {
@@ -159,7 +161,7 @@ namespace RapidWPF.Graphics
                 TextSceneNode label = new TextSceneNode(geometry, material, FontSize, true);
                 label.SetPickable(false);
                 label.SetWorldTransform(Matrix4.makeTranslation(Floor.x + FontSize * 6, Ceiling.y, (Floor.z + Ceiling.z) * 0.5f)
-                    * Matrix4.makeRotationAxis(Vector3.UNIT_X, (float)(0.5f * Math.PI)) * Matrix4.makeScale(FontSize * 0.1f, FontSize * 0.1f, FontSize * 0.1f));
+                    * Matrix4.makeRotationAxis(Vector3.UNIT_X, (float)(0.5f * Math.PI)) * Matrix4.makeScale(FontSize * 0.01f, FontSize * 0.01f, FontSize * 0.01f));
                 plotModel.AddNode(label);
             }
             {

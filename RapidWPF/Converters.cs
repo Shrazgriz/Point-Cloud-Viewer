@@ -128,7 +128,7 @@ namespace RapidWPF
             {
                 points.Add(item);
             }
-            TopoShape plygon = SketchBuilder.MakePolygonFace(points)
+            TopoShape plygon = SketchBuilder.MakePolygonFace(points);
             return plygon;
         }
     }

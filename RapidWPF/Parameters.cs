@@ -102,6 +102,7 @@ namespace RapidWPF
             IntervalY = int.Parse(ConfigurationManager.AppSettings["IntervalY"]);
             IntervalZ = int.Parse(ConfigurationManager.AppSettings["IntervalZ"]);
             Tesslation = 1;
+            FontSize = float.Parse(ConfigurationManager.AppSettings["FontSize"]);
         }
     }
 }

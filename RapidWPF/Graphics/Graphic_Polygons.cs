@@ -11,14 +11,14 @@ using MVUnity.Geometry3D;
 
 namespace RapidWPF.Graphics
 {
-    public class Graphic_Polygons
+    public class Graphic_PolyAnalysis
     {
         const ulong PolyonID = 100;
         private static List<Polygon3D> polygons;
         private double mergeRation;
         private MVUnity.Exchange.CloudReader filereader;
 
-        public Graphic_Polygons(MVUnity.Exchange.CloudReader reader, Parameters parameter)
+        public Graphic_PolyAnalysis(MVUnity.Exchange.CloudReader reader, Parameters parameter)
         {
             filereader = new MVUnity.Exchange.CloudReader
             {
@@ -37,11 +37,11 @@ namespace RapidWPF.Graphics
             {
                 return false;
             }
-            if (Graphic_Polygons.polygons == null)
+            if (polygons == null)
             {
-                Graphic_Polygons.polygons = new List<Polygon3D>();
+                polygons = new List<Polygon3D>();
             }
-            else { Graphic_Polygons.polygons.Clear(); }
+            else { polygons.Clear(); }
             #region 区分异源点云
             List<List<ScanRow>> diffRows = filereader.ReadMultipleCloudOpton(filereader.RowSkip, filereader.VertSkip);
 
@@ -164,7 +164,6 @@ namespace RapidWPF.Graphics
             }
             List<List<CompiledRegion>> groups = DBScan.ClusteringRegions(regions.FindAll(r => r.CellCount > CloudConstants.MinRegionCellCount).ToList());
 
-            List<Polygon3D> polygons = new List<Polygon3D>();
             for (int i = 0; i < groups.Count; i++)
             {
                 if (groups[i].Count == 1)
@@ -205,7 +204,10 @@ namespace RapidWPF.Graphics
             {
                 id++;
                 TopoShape face = ConvertPoly3.ToShape(rect);
-                MeshPhongMaterial material = MeshPhongMaterial.Create("phong.bspline");
+                var material = MeshStandardMaterial.Create("my-material");
+                material.SetRoughness(0.75f);
+                material.SetMetalness(0.1f);
+                material.SetColor(ConvertV3.ToVector3(rect.Norm));
                 BrepSceneNode entity = BrepSceneNode.Create(face, material, material);
                 entity.SetUserId(id);
                 render.ShowSceneNode(entity);
@@ -215,7 +217,9 @@ namespace RapidWPF.Graphics
         public void Run(RenderControl render)
         {
             if (!ReadData())
-                return;
+            {
+                throw new Exception("未能读取点云");
+            }                
             DrawPolys(render);
         }
     }
