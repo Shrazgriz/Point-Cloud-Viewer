@@ -204,7 +204,8 @@ namespace RapidWPF.Graphics
             {
                 id++;
                 TopoShape face = ConvertPoly3.ToShape(rect);
-                var material = MeshStandardMaterial.Create("my-material");
+                MeshStandardMaterial material = MeshStandardMaterial.Create("my-material");
+                material.SetFaceSide(EnumFaceSide.DoubleSide);
                 material.SetRoughness(0.75f);
                 material.SetMetalness(0.1f);
                 material.SetColor(ConvertV3.ToVector3(rect.Norm));

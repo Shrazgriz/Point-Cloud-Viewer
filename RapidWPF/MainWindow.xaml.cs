@@ -18,6 +18,7 @@ using MVUnity.PointCloud;
 using MVUnity.Geometry3D;
 using AnyCAD.Foundation;
 using RapidWPF.Graphics;
+using System.Collections.ObjectModel;
 
 namespace RapidWPF
 {
@@ -30,13 +31,15 @@ namespace RapidWPF
         const ulong PolyonID = 100;
         private MVUnity.Exchange.CloudReader filereader;
         private Parameters parameters;
-        public PickItemInfo Pick;
+        public ObservableCollection<PickItemInfo> UserSelection;
         public MainWindow()
         {
             InitializeComponent();
             parameters = new Parameters();
-            Selection.DataContext = Pick;
+            UserSelection = new ObservableCollection<PickItemInfo>();
+            LV_selection.ItemsSource = UserSelection;
         }
+
         AnyCAD.Forms.DefaltPickListener.AfterSelectHandler OnRenderSelection
         {
             get
@@ -44,11 +47,18 @@ namespace RapidWPF
                 return (PickedResult result) =>
                 {
                     if (result.IsEmpty())
+                    {
                         return;
+                    }                        
                     var item = result.GetItem();
                     if (item.GetNode() == null)
+                    {
+                        UserSelection.Clear();
                         return;
-                    Pick = new PickItemInfo(item);
+                    }
+                    var newInfo = new PickItemInfo(item);
+                    Selection.DataContext = newInfo;
+                    UserSelection.Add(newInfo);
                 };
             }
         }
@@ -60,11 +70,19 @@ namespace RapidWPF
             render.SetSelectCallback((PickedResult result) =>
             {
                 if (result.IsEmpty())
+                {
+                    UserSelection.Clear();
+                    Selection.DataContext = new PickItemInfo();
                     return;
+                }
                 var item = result.GetItem();
                 if (item.GetNode() == null)
+                {
                     return;
-                Pick = new PickItemInfo(item);
+                }
+                var newInfo = new PickItemInfo(item);
+                Selection.DataContext = newInfo;
+                UserSelection.Add(newInfo);
             });
         }
 

@@ -13,7 +13,7 @@ namespace RapidWPF
     public class PickItemInfo
     {
         public uint ShapeID { get; set; }
-        public uint ID { get; set; }
+        public ulong ID { get; set; }
         public string Name { get; set; }
         
         public string ShapeType { get; set; }
@@ -24,11 +24,12 @@ namespace RapidWPF
         }
         public PickItemInfo(PickedItem Item)
         {
-            ID = Item.GetNodeId();
-            Name = Item.GetNode().GetType().Name;
+            var node = Item.GetNode();
+            ID = node.GetUserId();
+            Name = node.GetType().Name;
             ShapeType = Item.GetShapeType().ToString();
             ShapeID = Item.GetTopoShapeId();
-            Console.WriteLine(string.Format("{0},{1},{2},{3}", ID, Name, ShapeType, ShapeID));
+            Console.WriteLine(string.Format("NodeID{0},{1},{2},ShapeID{3}", ID, Name, ShapeType, ShapeID));
         }
     }
 }
