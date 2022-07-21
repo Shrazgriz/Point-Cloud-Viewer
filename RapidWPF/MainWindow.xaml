@@ -45,6 +45,44 @@
                 </Button>
             </WrapPanel>
         </materialDesign:Card>
+        <materialDesign:Card Margin="8 4" Padding="4" Grid.Column="0" Grid.Row="1">
+            <StackPanel Orientation="Vertical">
+                <Grid x:Name="Selection">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="{Binding Path=ShapeType}" Grid.Row="0" Grid.Column="0"/>
+                    <Label Content="{Binding Path=ShapeID}" Grid.Row="0" Grid.Column="1"/>
+                    <Label Content="{Binding Path=Name}" Grid.Row="1" Grid.Column="0"/>
+                    <Label Content="{Binding Path=ID}" Grid.Row="1" Grid.Column="1"/>
+                </Grid>
+                <ListView x:Name="LV_selection">
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="local:PickItemInfo">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="{Binding Path=ShapeType}" Grid.Row="0" Grid.Column="0"/>
+                                <Label Content="{Binding Path=ShapeID}" Grid.Row="0" Grid.Column="1"/>
+                                <Label Content="{Binding Path=Name}" Grid.Row="1" Grid.Column="0"/>
+                                <Label Content="{Binding Path=ID}" Grid.Row="1" Grid.Column="1"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>            
+        </materialDesign:Card>
         <anycad:RenderControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="mRenderCtrl" 
                                ViewerReady="mRenderCtrl_ViewerReady"/>
     </Grid>

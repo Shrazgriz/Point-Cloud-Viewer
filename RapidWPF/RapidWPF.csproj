@@ -86,6 +86,7 @@
     <Compile Include="DBScan.cs" />
     <Compile Include="Graphics\Graphic_Cloud.cs" />
     <Compile Include="Graphics\Graphic_Polygons.cs" />
+    <Compile Include="NodeInfo.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="WReadCloud.xaml.cs">
       <DependentUpon>WReadCloud.xaml</DependentUpon>

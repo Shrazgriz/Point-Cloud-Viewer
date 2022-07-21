@@ -30,16 +30,42 @@ namespace RapidWPF
         const ulong PolyonID = 100;
         private MVUnity.Exchange.CloudReader filereader;
         private Parameters parameters;
+        public PickItemInfo Pick;
         public MainWindow()
         {
             InitializeComponent();
             parameters = new Parameters();
+            Selection.DataContext = Pick;
+        }
+        AnyCAD.Forms.DefaltPickListener.AfterSelectHandler OnRenderSelection
+        {
+            get
+            {
+                return (PickedResult result) =>
+                {
+                    if (result.IsEmpty())
+                        return;
+                    var item = result.GetItem();
+                    if (item.GetNode() == null)
+                        return;
+                    Pick = new PickItemInfo(item);
+                };
+            }
         }
 
         private void mRenderCtrl_ViewerReady()
         {
-            //AnyCAD.Forms.RenderControl render = mRenderCtrl.View3D;
-            //render.SetBackgroundColor(0f, 0.5f, 0.5f, 0.25f);
+            AnyCAD.Forms.RenderControl render = mRenderCtrl.View3D;
+            render.SetBackgroundColor(0.9f, 1f, 1f, 0.5f);
+            render.SetSelectCallback((PickedResult result) =>
+            {
+                if (result.IsEmpty())
+                    return;
+                var item = result.GetItem();
+                if (item.GetNode() == null)
+                    return;
+                Pick = new PickItemInfo(item);
+            });
         }
 
         private void BN_ReadCloud_Click(object sender, RoutedEventArgs e)

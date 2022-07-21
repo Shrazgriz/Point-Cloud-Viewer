@@ -611,12 +611,12 @@ namespace WpfCloud
             TopoShape face = GlobalInstance.BrepTools.MakeFace(plygon);
             return face;
         }
-        private Polygon3D FaceToPolygon(TopoShape PolyFace)
-        {
-            TopoExplor explor = new TopoExplor();
-            TopoShapeGroup v = explor.ExplorVertices(PolyFace);
+        //private Polygon3D FaceToPolygon(TopoShape PolyFace)
+        //{
+        //    TopoExplor explor = new TopoExplor();
+        //    TopoShapeGroup v = explor.ExplorVertices(PolyFace);
 
-        }
+        //}
         private void MainForm_Closed(object sender, EventArgs e)
         {
             Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
