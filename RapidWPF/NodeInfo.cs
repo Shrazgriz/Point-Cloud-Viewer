@@ -12,24 +12,36 @@ namespace RapidWPF
     /// </summary>
     public class PickItemInfo
     {
+        private ulong userID;
+
+        public ulong UserID
+        {
+            get => userID; set
+            {
+                userID = value;
+                IDSTR = string.Format("ID{0}", value);
+            }
+        }
         public uint ShapeID { get; set; }
-        public ulong ID { get; set; }
+        public ulong NodeID { get; set; }
         public string Name { get; set; }
-        
+
+        public string IDSTR { get; set; }
         public string ShapeType { get; set; }
         public PickItemInfo()
         {
-            ID = 0;
-            Name = "";
+            IDSTR = "";
+            ShapeType = "";
         }
         public PickItemInfo(PickedItem Item)
         {
             var node = Item.GetNode();
-            ID = node.GetUserId();
+            NodeID = Item.GetNodeId();
+            UserID = node.GetUserId();
             Name = node.GetType().Name;
             ShapeType = Item.GetShapeType().ToString();
             ShapeID = Item.GetTopoShapeId();
-            Console.WriteLine(string.Format("NodeID{0},{1},{2},ShapeID{3}", ID, Name, ShapeType, ShapeID));
+            Console.WriteLine(string.Format("NodeID{0},{1},{2},ShapeID{3}", NodeID, Name, ShapeType, ShapeID));
         }
     }
 }

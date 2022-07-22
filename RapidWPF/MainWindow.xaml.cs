@@ -66,7 +66,8 @@ namespace RapidWPF
         private void mRenderCtrl_ViewerReady()
         {
             AnyCAD.Forms.RenderControl render = mRenderCtrl.View3D;
-            render.SetBackgroundColor(0.9f, 1f, 1f, 0.5f);
+            var background = SkyboxBackground.Create("cloudy");
+            render.GetViewer().SetBackground(background);
             render.SetSelectCallback((PickedResult result) =>
             {
                 if (result.IsEmpty())
